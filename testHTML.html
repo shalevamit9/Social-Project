@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test</title>
+    <style>
+        body {
+            padding: 20px;
+
+        }
+        input {
+            display: block;
+            width: 30%;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <form action="/users/1" method="POST">
+        <label for="firstName">First Name</label>
+        <input type="text" name="firstName">
+        <br>
+        <label for="lastName">Last Name</label>
+        <input type="text" name="lastName">
+        <br>
+        <label for="email">email</label>
+        <input type="text" name="email">
+        <br>
+        <label for="userType">userType</label>
+        <input type="text" name="userType">
+        <br>
+
+        <label for="id">id</label>
+        <input type="text" name="id">
+        <br>
+        <input type="hidden" name="contactUser" value="true">
+        <br>
+        <button type="submit">Submit</button>
+        <br>
+    </form>
+</body>
+</html>

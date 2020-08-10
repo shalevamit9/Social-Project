@@ -53,7 +53,8 @@ const postNewUser = async (req, res, next) => {
             lastName: req.body.lastName,
             email: req.body.email,
             userType: req.body.userType,
-            contactUser: req.body.contactUser
+            contactUser: req.body.contactUser,
+            id: req.body.id
         };
 
         const [results, meta] = await sequelize.query(
