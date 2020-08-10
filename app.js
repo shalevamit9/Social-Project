@@ -7,6 +7,8 @@ const bodyParser = require('body-parser');
 // Initialize server.
 const app = express();
 
+// CHANGE
+
 // Endpoints
 // app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
