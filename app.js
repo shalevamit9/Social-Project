@@ -1,13 +1,13 @@
 // Requires
 const express = require('express');
-// const sequelize = require('./utils/database');
+const sequelize = require('./utils/database');
 const usersRoutes = require('./routes/users');
 const bodyParser = require('body-parser');
 
 // Initialize server.
 const app = express();
 
-// CHANGE
+
 
 // Endpoints
 // app.use(bodyParser.urlencoded({ extended: true }));
