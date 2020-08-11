@@ -7,7 +7,6 @@
     <style>
         body {
             padding: 20px;
-
         }
         input {
             display: block;
@@ -18,23 +17,11 @@
 </head>
 <body>
     <form action="/users/1" method="POST">
-        <label for="firstName">First Name</label>
-        <input type="text" name="firstName">
+        <label for="userName">User Name</label>
+        <input type="text" name="userName">
         <br>
-        <label for="lastName">Last Name</label>
-        <input type="text" name="lastName">
-        <br>
-        <label for="email">email</label>
-        <input type="text" name="email">
-        <br>
-        <label for="userType">userType</label>
-        <input type="text" name="userType">
-        <br>
-
-        <label for="id">id</label>
-        <input type="text" name="id">
-        <br>
-        <input type="hidden" name="contactUser" value="true">
+        <label for="password">Password</label>
+        <input type="text" name="password">
         <br>
         <button type="submit">Submit</button>
         <br>

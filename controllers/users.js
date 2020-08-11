@@ -3,10 +3,71 @@
  * 'POST', 'GET, 'PATCH', 'DELETE'
  */
 
-const { QueryTypes } = require('sequelize');
+const { QueryTypes } = require('sequelize'); // For getting queries.
+const jwt = require('jsonwebtoken'); // For processing token.
+// const path = require('path'); 
 
-// importing the pool connection
+// Importing the pool.
 const sequelize = require('../utils/database');
+
+// // Set token.
+// function FormatAndSetToken(req, res, next) {
+//     // Get auth header value.
+//     const bearerHeader = req.headers['authorization'];
+
+//     // Check if bearer is undefined.
+//     if (typeof bearerHeader !== 'undefined') {
+//         // Split at the space
+//         const bearer = bearerHeader.split(' ');
+
+//         // Get token from array
+//         const bearerToken = bearer;
+
+//         //Set the Token
+//         req.token = bearerToken
+
+//         // Next middleware
+//         next();
+//     }
+//     else {
+        
+//         // Unauthorized
+//         res.sendStatus(401);
+//     }
+// }
+
+const signJWTandSendJSON = async (req, res, next) => {
+    try {
+        
+        // <--- Doesnt work yet! --->
+        // const user = {
+        //     userName: req.body.userName,
+        //     password: req.body.password
+        // };
+
+        // Mock user
+        const user = {
+            userName: 'testUser',
+            password: 'password'
+        };
+        
+        if (user !== 'undefined') {
+            jwt.sign({user}, 'secretkey', (error, token) => {
+                // TODO: Set Timer
+                res.json({
+                    "data":[token]
+                })
+                console.log('--success--')
+            });
+        }
+        else {
+            res.sendStatus(403);
+        }
+    }
+    catch (error) {
+        console.log(error);
+    }
+}
 
 /**
  * Method gets called on '/users'.
@@ -16,8 +77,6 @@ const sequelize = require('../utils/database');
 const getAllUsers = async (req, res, next) => {
     try {
         const users = await sequelize.query('SELECT *  FROM users', { type: QueryTypes.SELECT });
-
-        // console.table(users);
 
         // returns JSON 
         res.send(users);
@@ -29,64 +88,30 @@ const getAllUsers = async (req, res, next) => {
 
 /**
  * Method gets called on '/users/:id'. The id is given.
- * 
  * Creates new user and inserts the user to the database.
  */
 const postNewUser = async (req, res, next) => {
 
     console.log('entered post');
-    // Given user's id.
-    const id = req.params.id;
-
-    console.log(id);
 
     // html should use <form></form> for this to work!
     try {
-        // const firstName = req.body.firstName;
-        // const lastName = req.body.lastName;
-        // const email = req.body.email;
-        // const userType = req.body.userType;
-        // const contactUser = req.body.contactUser;
 
         const user = {
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            email: req.body.email,
-            userType: req.body.userType,
-            contactUser: req.body.contactUser,
-            id: req.body.id
+            userName: req.body.userName,
+            password: req.body.password
         };
 
         const [results, meta] = await sequelize.query(
-            `INSERT INTO users (name, email, userType, contact) VALUES (?, ?, ?, ?)`,
+            `INSERT INTO users (userName, password) VALUES (?, ?)`,
             {
                 type: QueryTypes.INSERT,
-                replacements: [user.firstName + ' ' + user.lastName, user.email, user.userType, user.contactUser]
+                replacements: [user.userName, user.password]
             });
-
-        // const user = {
-        //     name: 'kakikatan',
-        //     email: 'test@test.com',
-        //     userType: 'benzona',
-        //     contactUser: true
-        // };
-        
-        // const [results, metadata] = await sequelize.query(
-        //     `INSERT INTO users (name, email, userType, contact) VALUES (?, ?, ?, ?)`,
-        //     {
-        //         type: QueryTypes.INSERT,
-        //         replacements: [user.name, user.email, user.userType, user.contactUser]
-        //     });
         
         results[0] = user;
-        console.log(results);
-        console.log('space');
-        
+        console.log(results);       
         res.send(results);
-        res.redirect('/');
-        
-        // const [results, meta] = await sequelize.query('INSERT INTO users (name, email, userType, contact) VALUES (?, ?, ?, ?)',
-        //     [`${user.firstName} ${user.lastName}`, user.email, user.userType, user.contactUser], );
     }
     catch (err) {
         console.log(err);
@@ -96,5 +121,6 @@ const postNewUser = async (req, res, next) => {
 //exports
 module.exports = {
     getAllUsers: getAllUsers,
-    postNewUser: postNewUser
+    postNewUser: postNewUser,
+    signJWTandSendJSON: signJWTandSendJSON
 };
