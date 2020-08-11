@@ -71,7 +71,6 @@ const signJWTandSendJSON = async (req, res, next) => {
 
 /**
  * Method gets called on '/users'.
- * 
  * Returns all users in database.
  */
 const getAllUsers = async (req, res, next) => {
