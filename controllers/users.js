@@ -37,21 +37,24 @@ const sequelize = require('../utils/database');
 // }
 
 const signJWTandSendJSON = async (req, res, next) => {
-    try {
-        
-        // <--- Doesnt work yet! --->
-        // const user = {
-        //     userName: req.body.userName,
-        //     password: req.body.password
-        // };
-
-        // Mock user
+    try {     
+        // Get userName and password from req.body
         const user = {
-            userName: 'testUser',
-            password: 'password'
+            userName: req.body.userName,
+            password: req.body.password
         };
-        
+
+        console.log(user);
+
+        // // Mock user instead of above 'user'
+        // const user = {
+        //     userName: 'testUser',
+        //     password: 'password'
+        // };       
+        // console.log(user);
+
         if (user !== 'undefined') {
+            // TODO: set secret generator.
             jwt.sign({user}, 'secretkey', (error, token) => {
                 // TODO: Set Timer
                 res.json({
@@ -91,26 +94,35 @@ const getAllUsers = async (req, res, next) => {
  */
 const postNewUser = async (req, res, next) => {
 
-    console.log('entered post');
+    console.log('Entered POST: create new user');
 
     // html should use <form></form> for this to work!
     try {
 
         const user = {
-            userName: req.body.userName,
-            password: req.body.password
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            email: req.body.email,
+            userType: req.body.userType,
+            contactUser: req.body.contactUser
         };
 
+        console.log(req.body);
+
         const [results, meta] = await sequelize.query(
-            `INSERT INTO users (userName, password) VALUES (?, ?)`,
+            `INSERT INTO users (firstName, lastName, email, userType, contactUser) VALUES (?, ?, ?, ?, ?)`,
             {
                 type: QueryTypes.INSERT,
-                replacements: [user.userName, user.password]
+                replacements: [user.firstName,
+                               user.lastName,
+                               user.email,
+                               user.userType,
+                               user.contactUser]
             });
-        
-        results[0] = user;
-        console.log(results);       
-        res.send(results);
+        results[0] = user;     
+        res.json({
+            data: results
+        })
     }
     catch (err) {
         console.log(err);
@@ -121,5 +133,5 @@ const postNewUser = async (req, res, next) => {
 module.exports = {
     getAllUsers: getAllUsers,
     postNewUser: postNewUser,
-    signJWTandSendJSON: signJWTandSendJSON
+    signJWTandSendJSON: signJWTandSendJSON,
 };
