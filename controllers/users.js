@@ -5,6 +5,7 @@
 
 const { QueryTypes } = require('sequelize'); // For getting queries.
 const jwt = require('jsonwebtoken'); // For processing token.
+const chalk = require('chalk'); // For Highlighting console logs.
 // const path = require('path'); 
 
 // Importing the pool.
@@ -28,6 +29,13 @@ const privateinfo = (function () {
     }
 })();
 
+/**
+ * First middleware of '/login'.
+ * 
+ * Verifies username and password.
+ * If true, inserts user's credentials to req and calls next middleware.
+ * else, sends 403 status (no access).
+ */
 const verifyUser = async (req, res, next) => {
     try {
         // Get userName and password from req.body
@@ -36,8 +44,7 @@ const verifyUser = async (req, res, next) => {
             password: req.body.password
         };
 
-        console.log(userData);
-
+        // Query for getting credentials from Database
         const user = await sequelize.query(
             `SELECT username, password FROM users WHERE username=? AND password=?`,
             {
@@ -45,48 +52,14 @@ const verifyUser = async (req, res, next) => {
                 replacements: [userData.userName,
                 userData.password]
             });
-
+        
+        // Correct login credentials
         if (user.length) {
             req.userData = userData;
             next();
         }
         else {
-            res.sendStatus(403);
-        }
-    }
-    catch (error) {
-        console.log(error);
-    }
-}
-
-const signJWTAndSendJSON = async (req, res, next) => {
-    try {     
-        // Get userName and password from req.body
-        const userData = {
-            userName: req.body.userName,
-            password: req.body.password
-        };
-
-        console.log(userData);
-
-        const user = await sequelize.query(
-            `SELECT username, password FROM users WHERE username=? AND password=?`,
-            {
-                type: QueryTypes.SELECT,
-                replacements: [userData.userName,
-                               userData.password]
-            });
-
-        if (user.length) {
-            // Sign payload, secret key and expiration timer.
-            jwt.sign({ userData }, privateinfo.getSecret(), {expiresIn: privateinfo.getExpiration()}, (error, token) => {
-                res.json({
-                    "data": [token]
-                });
-                console.log('--success--');
-            });
-        }
-        else {
+            console.log(chalk.bgRed.bold('Wrong login credentials'))
             res.sendStatus(403);
         }
     }
@@ -96,12 +69,29 @@ const signJWTAndSendJSON = async (req, res, next) => {
 }
 
 /**
+ * Second middleware of '/login'.
+ * 
+ * Gets validated login credentials from previous middleware.
+ * Signs token, and sends it back in JSON format.
+ */
+const signJWTAndSendJSON = async (req, res, next) => {
+    const validatedUser = req.userData;
+
+    jwt.sign({ validatedUser }, privateinfo.getSecret(), { expiresIn: privateinfo.getExpiration() }, (error, token) => {
+        res.json({
+            "data": [token]
+        });
+        console.log(chalk.bgGreen.bold('---Token Sent Successfully!---'));
+    });
+}
+
+/**
  * Method gets called on '/users'.
- * Returns all users in database.
+ * Returns all users in database in JSON format.
  */
 const getAllUsers = async (req, res, next) => {
     try {
-        const users = await sequelize.query('SELECT *  FROM users', { type: QueryTypes.SELECT });
+        const users = await sequelize.query('SELECT * FROM users', { type: QueryTypes.SELECT });
 
         // returns JSON 
         res.send(users);
@@ -117,11 +107,10 @@ const getAllUsers = async (req, res, next) => {
  */
 const postNewUser = async (req, res, next) => {
 
-    console.log('Entered POST: create new user');
+    console.log(chalk.green('Entered POST: create new user'));
 
     // html should use <form></form> for this to work!
     try {
-
         const user = {
             firstName: req.body.firstName,
             lastName: req.body.lastName,
@@ -130,22 +119,36 @@ const postNewUser = async (req, res, next) => {
             password: req.body.password
         };
 
-        console.log(req.body);
-
-        const [results, meta] = await sequelize.query(
-            `INSERT INTO users (firstName, lastName, email, userName, password) VALUES (?, ?, ?, ?, ?)`,
+        // Check if username is taken
+        const existingUser = await sequelize.query(
+            `SELECT username FROM users WHERE username=?`,
             {
-                type: QueryTypes.INSERT,
-                replacements: [user.firstName,
-                               user.lastName,
-                               user.email,
-                               user.userName,
-                               user.password]
+                type: QueryTypes.SELECT,
+                replacements: [user.userName]
             });
-        results[0] = user;     
-        res.json({
-            data: results
-        })
+
+        // User does not exists. Creating new user
+        if (!existingUser.length) { 
+            const [results, meta] = await sequelize.query(
+                `INSERT INTO users (firstName, lastName, email, userName, password) VALUES (?, ?, ?, ?, ?)`,
+                {
+                    type: QueryTypes.INSERT,
+                    replacements: [user.firstName,
+                    user.lastName,
+                    user.email,
+                    user.userName,
+                    user.password]
+                });
+            results[0] = user;
+            res.json({
+                data: results
+            })
+        }
+        else { // User exists. bassa
+            res.json({
+                userAlreadyExists: true
+            })
+        }
     }
     catch (err) {
         console.log(err);
@@ -156,5 +159,6 @@ const postNewUser = async (req, res, next) => {
 module.exports = {
     getAllUsers: getAllUsers,
     postNewUser: postNewUser,
-    signJWTAndSendJSON: signJWTAndSendJSON
+    signJWTAndSendJSON: signJWTAndSendJSON,
+    verifyUser: verifyUser
 };

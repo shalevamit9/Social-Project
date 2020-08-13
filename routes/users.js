@@ -18,7 +18,11 @@ router.get('/users', usersController.getAllUsers);
 // Create new user
 router.post('/users/:id', usersController.postNewUser);
 
-// Sign and send back JWT
-router.post('/login', usersController.signJWTAndSendJSON);
+/**
+ * 1. Verify user
+ * 2. Sign token
+ * 3. send token back as json
+ */
+router.post('/login', usersController.verifyUser, usersController.signJWTAndSendJSON);
 
 module.exports = router;
