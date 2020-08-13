@@ -28,26 +28,58 @@ const privateinfo = (function () {
     }
 })();
 
-const signJWTAndSendJSON = async (req, res, next) => {
-    try {     
+const verifyUser = async (req, res, next) => {
+    try {
         // Get userName and password from req.body
-        const user = {
+        const userData = {
             userName: req.body.userName,
             password: req.body.password
         };
 
-        console.log(user);
+        console.log(userData);
 
-        // // Mock user instead of above 'user'
-        // const user = {
-        //     userName: 'testUser',
-        //     password: 'password'
-        // };       
-        // console.log(user);
+        const user = await sequelize.query(
+            `SELECT username, password FROM users WHERE username=? AND password=?`,
+            {
+                type: QueryTypes.SELECT,
+                replacements: [userData.userName,
+                userData.password]
+            });
 
-        if (user) {
+        if (user.length) {
+            req.userData = userData;
+            next();
+        }
+        else {
+            res.sendStatus(403);
+        }
+    }
+    catch (error) {
+        console.log(error);
+    }
+}
+
+const signJWTAndSendJSON = async (req, res, next) => {
+    try {     
+        // Get userName and password from req.body
+        const userData = {
+            userName: req.body.userName,
+            password: req.body.password
+        };
+
+        console.log(userData);
+
+        const user = await sequelize.query(
+            `SELECT username, password FROM users WHERE username=? AND password=?`,
+            {
+                type: QueryTypes.SELECT,
+                replacements: [userData.userName,
+                               userData.password]
+            });
+
+        if (user.length) {
             // Sign payload, secret key and expiration timer.
-            jwt.sign({ user }, privateinfo.getSecret(), {expiresIn: privateinfo.getExpiration()}, (error, token) => {
+            jwt.sign({ userData }, privateinfo.getSecret(), {expiresIn: privateinfo.getExpiration()}, (error, token) => {
                 res.json({
                     "data": [token]
                 });
@@ -94,21 +126,21 @@ const postNewUser = async (req, res, next) => {
             firstName: req.body.firstName,
             lastName: req.body.lastName,
             email: req.body.email,
-            userType: req.body.userType,
-            contactUser: req.body.contactUser
+            userName: req.body.userName,
+            password: req.body.password
         };
 
         console.log(req.body);
 
         const [results, meta] = await sequelize.query(
-            `INSERT INTO users (firstName, lastName, email, userType, contactUser) VALUES (?, ?, ?, ?, ?)`,
+            `INSERT INTO users (firstName, lastName, email, userName, password) VALUES (?, ?, ?, ?, ?)`,
             {
                 type: QueryTypes.INSERT,
                 replacements: [user.firstName,
                                user.lastName,
                                user.email,
-                               user.userType,
-                               user.contactUser]
+                               user.userName,
+                               user.password]
             });
         results[0] = user;     
         res.json({
