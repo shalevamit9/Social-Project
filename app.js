@@ -1,21 +1,17 @@
 // Requires
 const express = require('express');
-// const sequelize = require('./utils/database');
 const usersRoutes = require('./routes/users');
 const bodyParser = require('body-parser');
 
-// Initialize server.
+// Initialize server
 const app = express();
 
-// Endpoints
-// app.use(bodyParser.urlencoded({ extended: true }));
+// Parsing middlewares
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
+// Getting routes
 app.use(usersRoutes);
 
-// app.use('/', (req, res, next) => {
-//    res.
-// });
-
-// run
+// Run
 app.listen(3000, ()=> console.log('Server started on port 3000'))

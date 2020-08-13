@@ -10,31 +10,23 @@ const jwt = require('jsonwebtoken'); // For processing token.
 // Importing the pool.
 const sequelize = require('../utils/database');
 
-// // Set token.
-// function FormatAndSetToken(req, res, next) {
-//     // Get auth header value.
-//     const bearerHeader = req.headers['authorization'];
+const privateinfo = (function () {
 
-//     // Check if bearer is undefined.
-//     if (typeof bearerHeader !== 'undefined') {
-//         // Split at the space
-//         const bearer = bearerHeader.split(' ');
+    // Secret for signing JWT
+    const secret = '42C20602620F2E33BAA6794FA1550D6F747C5526A8F89A7ED9C92D6718E62B64';
 
-//         // Get token from array
-//         const bearerToken = bearer;
+    // Miliseconds
+    const Expiration = 10000;
 
-//         //Set the Token
-//         req.token = bearerToken
-
-//         // Next middleware
-//         next();
-//     }
-//     else {
-        
-//         // Unauthorized
-//         res.sendStatus(401);
-//     }
-// }
+    return {
+        getSecret: () => {
+            return secret;
+        },
+        getExpiration: () => {
+            return Expiration;
+        }
+    }
+})();
 
 const signJWTandSendJSON = async (req, res, next) => {
     try {     
@@ -53,14 +45,13 @@ const signJWTandSendJSON = async (req, res, next) => {
         // };       
         // console.log(user);
 
-        if (user !== 'undefined') {
-            // TODO: set secret generator.
-            jwt.sign({user}, 'secretkey', (error, token) => {
-                // TODO: Set Timer
+        if (user) {
+            // Sign payload, secret key and expiration timer.
+            jwt.sign({ user }, privateinfo.getSecret(), {expiresIn: privateinfo.getExpiration()}, (error, token) => {
                 res.json({
-                    "data":[token]
-                })
-                console.log('--success--')
+                    "data": [token]
+                });
+                console.log('--success--');
             });
         }
         else {
