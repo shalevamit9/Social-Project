@@ -19,6 +19,6 @@ router.get('/users', usersController.getAllUsers);
 router.post('/users/:id', usersController.postNewUser);
 
 // Sign and send back JWT
-router.post('/login', usersController.signJWTandSendJSON);
+router.post('/login', usersController.signJWTAndSendJSON);
 
 module.exports = router;

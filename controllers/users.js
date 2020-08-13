@@ -28,7 +28,7 @@ const privateinfo = (function () {
     }
 })();
 
-const signJWTandSendJSON = async (req, res, next) => {
+const signJWTAndSendJSON = async (req, res, next) => {
     try {     
         // Get userName and password from req.body
         const user = {
@@ -124,5 +124,5 @@ const postNewUser = async (req, res, next) => {
 module.exports = {
     getAllUsers: getAllUsers,
     postNewUser: postNewUser,
-    signJWTandSendJSON: signJWTandSendJSON,
+    signJWTAndSendJSON: signJWTAndSendJSON
 };
