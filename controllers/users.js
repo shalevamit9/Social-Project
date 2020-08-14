@@ -29,6 +29,62 @@ const privateinfo = (function () {
     }
 })();
 
+const verifyToken = async (req, res, next) => {
+    console.log(chalk.magenta.bold('---verifyToken---'));
+
+    try {
+        jwt.verify(req.token, privateinfo.getSecret(), (error, data) => {
+
+            if (data) {
+                console.log(chalk.green.bold('verifyToken complete. Calling next middleware.'))
+                next();
+            }
+            else {
+                console.log(chalk.red.bold('Error- ' + error))
+                res.sendStatus(403);
+            }
+        })
+    }
+    catch (err) {
+        console.log(chalk.red.bold('Something went wrong'))
+    }
+}
+
+/**
+ * Gets bearer token from req.headers (authorization section).
+ * 
+ * If token is defined, it is extracted, and applied to req.token.
+ * Else, sends 403 status (access forbidden).
+ */
+const formatAndSetToken = async (req, res, next) => {
+    console.log(chalk.magenta.bold('---formatAndSetToken---'))
+
+    // Get auth header value.
+    const bearerHeader = req.headers['authorization'];
+
+    // Check if bearer is undefined.
+    if (typeof bearerHeader !== 'undefined') {
+        // Split on space
+        const bearer = bearerHeader.split(' ');
+
+        // Get token from array
+        const bearerToken = bearer[1];
+
+        //Set the Token
+        req.token = bearerToken
+
+        // Next middleware
+        console.log(chalk.green.bold('formatAndSetToken complete. Calling next middleware'))
+        next();
+    }
+    else {
+
+        // Unauthorized
+        console.log(chalk.red.bold('forbidden'));
+        res.sendStatus(403);
+    }
+}
+
 /**
  * First middleware of '/login'.
  * 
@@ -37,6 +93,8 @@ const privateinfo = (function () {
  * else, sends 403 status (no access).
  */
 const verifyUser = async (req, res, next) => {
+    console.log(chalk.magenta.bold('---verifyUser---'))
+
     try {
         // Get userName and password from req.body
         const userData = {
@@ -50,16 +108,18 @@ const verifyUser = async (req, res, next) => {
             {
                 type: QueryTypes.SELECT,
                 replacements: [userData.userName,
-                userData.password]
+                               userData.password]
             });
         
         // Correct login credentials
         if (user.length) {
             req.userData = userData;
+            console.log(chalk.magenta.bold('---verifyUser complete. Calling next middlware---'));
+
             next();
         }
         else {
-            console.log(chalk.bgRed.bold('Wrong login credentials'))
+            console.log(chalk.red.bold('Wrong login credentials'))
             res.sendStatus(403);
         }
     }
@@ -75,13 +135,15 @@ const verifyUser = async (req, res, next) => {
  * Signs token, and sends it back in JSON format.
  */
 const signJWTAndSendJSON = async (req, res, next) => {
+    console.log(chalk.green.bold('---signJWTAndSendJSON---'));
+
     const validatedUser = req.userData;
 
     jwt.sign({ validatedUser }, privateinfo.getSecret(), { expiresIn: privateinfo.getExpiration() }, (error, token) => {
         res.json({
             "data": [token]
         });
-        console.log(chalk.bgGreen.bold('---Token Sent Successfully!---'));
+        console.log(chalk.green.bold('---signJWTAndSendJSON complete. Token Sent Successfully!---'));
     });
 }
 
@@ -160,5 +222,7 @@ module.exports = {
     getAllUsers: getAllUsers,
     postNewUser: postNewUser,
     signJWTAndSendJSON: signJWTAndSendJSON,
-    verifyUser: verifyUser
+    verifyUser: verifyUser,
+    formatAndSetToken: formatAndSetToken,
+    verifyToken: verifyToken
 };

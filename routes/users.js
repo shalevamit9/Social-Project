@@ -13,7 +13,7 @@ router.get('/', (req, res, next) => {
 });
 
 // Returns JSON of all users
-router.get('/users', usersController.getAllUsers);
+router.get('/users', usersController.formatAndSetToken, usersController.verifyToken,  usersController.getAllUsers);
 
 // Create new user
 router.post('/users/:id', usersController.postNewUser);
