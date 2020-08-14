@@ -54,7 +54,7 @@ const verifyToken = async (req, res, next) => {
         })
     }
     catch (err) {
-        console.log(chalk.red.bold('Something went wrong: ' + err))
+        console.log(chalk.red.bold('verifyToken failed: ' + err))
     }
 }
 
@@ -177,7 +177,7 @@ const getAllUsers = async (req, res, next) => {
  */
 const postNewUser = async (req, res, next) => {
 
-    console.log(chalk.green('Entered POST: create new user'));
+    console.log(chalk.green.bold('Entered POST: create new user'));
 
     // html should use <form></form> for this to work!
     try {
@@ -194,7 +194,7 @@ const postNewUser = async (req, res, next) => {
         // User does not exists. Creating new user
         if (!existingUser.length) { 
 
-            console.log(chalk.green('Creating new user'));
+            console.log(chalk.green.bold('Creating new user'));
 
             const [results, meta] = await sequelize.query(
                 `INSERT INTO users (firstName, lastName, email, userName, password) VALUES (?, ?, ?, ?, ?)`,
@@ -212,7 +212,7 @@ const postNewUser = async (req, res, next) => {
             })
         }
         else { // User exists. bassa
-            console.log(chalk.red('User Already exists in databse: ' + existingUser));
+            console.log(chalk.red.bold('User Already exists in databse: ' + existingUser));
             res.json({
                 userAlreadyExists: true
             })
