@@ -29,6 +29,14 @@ const privateinfo = (function () {
     }
 })();
 
+/**
+ * Verifies token from user using 'jwt.verify'.
+ * 
+ * If user token is valid, grants access to requested webpage. 
+ * Else, sends 403 status (access forbidden).
+ * 
+ * If 'jwt.verify' doesn't execute, catches error and logs it.
+ */
 const verifyToken = async (req, res, next) => {
     console.log(chalk.magenta.bold('---verifyToken---'));
 
@@ -46,7 +54,7 @@ const verifyToken = async (req, res, next) => {
         })
     }
     catch (err) {
-        console.log(chalk.red.bold('Something went wrong'))
+        console.log(chalk.red.bold('Something went wrong: ' + err))
     }
 }
 
