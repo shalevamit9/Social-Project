@@ -189,25 +189,22 @@ const postNewUser = async (req, res, next) => {
             password: req.body.password
         };
 
-        // Check if username is taken
-        const existingUser = await sequelize.query(
-            `SELECT username FROM users WHERE username=?`,
-            {
-                type: QueryTypes.SELECT,
-                replacements: [user.userName]
-            });
+        const existingUser = await userExistsInDB(user.userName)
 
         // User does not exists. Creating new user
         if (!existingUser.length) { 
+
+            console.log(chalk.green('Creating new user'));
+
             const [results, meta] = await sequelize.query(
                 `INSERT INTO users (firstName, lastName, email, userName, password) VALUES (?, ?, ?, ?, ?)`,
                 {
                     type: QueryTypes.INSERT,
                     replacements: [user.firstName,
-                    user.lastName,
-                    user.email,
-                    user.userName,
-                    user.password]
+                                   user.lastName,
+                                   user.email,
+                                   user.userName,
+                                   user.password]
                 });
             results[0] = user;
             res.json({
@@ -215,6 +212,7 @@ const postNewUser = async (req, res, next) => {
             })
         }
         else { // User exists. bassa
+            console.log(chalk.red('User Already exists in databse: ' + existingUser));
             res.json({
                 userAlreadyExists: true
             })
@@ -225,7 +223,22 @@ const postNewUser = async (req, res, next) => {
     }
 };
 
-//exports
+/**
+ * Checks if user exists in database.
+ */
+const userExistsInDB = async (userName) => {
+    // Check if username is taken
+    const existingUser = await sequelize.query(
+        `SELECT username FROM users WHERE username=?`,
+        {
+            type: QueryTypes.SELECT,
+            replacements: [userName]
+        });
+    
+    return existingUser;
+}
+
+// Exports
 module.exports = {
     getAllUsers: getAllUsers,
     postNewUser: postNewUser,
