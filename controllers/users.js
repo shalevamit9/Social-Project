@@ -1,32 +1,34 @@
+/*jshint ignore:start*/
+
 /**
- * This file is for controlling the USERS databases by queries
- * 'POST', 'GET, 'PATCH', 'DELETE'
+ * This file contains middlewares for routes in the website
+ * and methods that access the database.
  */
 
-const { QueryTypes } = require('sequelize'); // For getting queries.
-const jwt = require('jsonwebtoken'); // For processing token.
-const chalk = require('chalk'); // For Highlighting console logs.
-// const path = require('path'); 
+const { QueryTypes } = require('sequelize');
+const jwt = require('jsonwebtoken'); 
+const chalk = require('chalk');
 
-// Importing the pool.
+/* Importing the pool. */
 const sequelize = require('../utils/database');
 
 const privateinfo = (function () {
 
-    // Secret for signing JWT
+    
+    /* Secret for signing JWT */
     const secret = '42C20602620F2E33BAA6794FA1550D6F747C5526A8F89A7ED9C92D6718E62B64';
 
-    // Miliseconds
+    /* Miliseconds */
     const Expiration = 10000;
 
     return {
         getSecret: () => {
             return secret;
-        },
+        }, 
         getExpiration: () => {
             return Expiration;
         }
-    }
+    };
 })();
 
 /**
@@ -34,8 +36,6 @@ const privateinfo = (function () {
  * 
  * If user token is valid, grants access to requested webpage. 
  * Else, sends 403 status (access forbidden).
- * 
- * If 'jwt.verify' doesn't execute, catches error and logs it.
  */
 const verifyToken = async (req, res, next) => {
     console.log(chalk.magenta.bold('---verifyToken---'));
@@ -44,19 +44,19 @@ const verifyToken = async (req, res, next) => {
         jwt.verify(req.token, privateinfo.getSecret(), (error, data) => {
 
             if (data) {
-                console.log(chalk.green.bold('verifyToken complete. Calling next middleware.'))
+                console.log(chalk.green.bold('verifyToken complete. Calling next middleware.'));
                 next();
             }
             else {
-                console.log(chalk.red.bold('Error- ' + error))
+                console.log(chalk.red.bold('Error- ' + error));
                 res.sendStatus(403);
             }
-        })
+        });
     }
     catch (err) {
-        console.log(chalk.red.bold('verifyToken failed: ' + err))
+        console.log(chalk.red.bold('verifyToken failed: ' + err));
     }
-}
+};
 
 /**
  * Gets bearer token from req.headers (authorization section).
@@ -65,61 +65,53 @@ const verifyToken = async (req, res, next) => {
  * Else, sends 403 status (access forbidden).
  */
 const formatAndSetToken = async (req, res, next) => {
-    console.log(chalk.magenta.bold('---formatAndSetToken---'))
+    console.log(chalk.magenta.bold('---formatAndSetToken---'));
 
-    // Get auth header value.
+    /* Get auth header value. */
     const bearerHeader = req.headers['authorization'];
 
-    // Check if bearer is undefined.
     if (typeof bearerHeader !== 'undefined') {
-        // Split on space
         const bearer = bearerHeader.split(' ');
-
-        // Get token from array
         const bearerToken = bearer[1];
+        req.token = bearerToken;
 
-        //Set the Token
-        req.token = bearerToken
-
-        // Next middleware
-        console.log(chalk.green.bold('formatAndSetToken complete. Calling next middleware'))
+    /* Next middleware */
+        console.log(chalk.green.bold('formatAndSetToken complete. Calling next middleware'));
         next();
     }
     else {
-
-        // Unauthorized
         console.log(chalk.red.bold('forbidden'));
         res.sendStatus(403);
     }
-}
+};
 
 /**
  * First middleware of '/login'.
- * 
+ *
  * Verifies username and password.
- * If true, inserts user's credentials to req and calls next middleware.
+ * If true, inserts userhs credentials to req and calls next middleware.
  * else, sends 403 status (no access).
  */
 const verifyUser = async (req, res, next) => {
-    console.log(chalk.magenta.bold('---verifyUser---'))
+    console.log(chalk.magenta.bold('---verifyUser---'));
 
     try {
-        // Get userName and password from req.body
+        /* Get userName and password from req.body */
         const userData = {
             userName: req.body.userName,
             password: req.body.password
         };
 
-        // Query for getting credentials from Database
+        /* Query for getting credentials from Database */
         const user = await sequelize.query(
             `SELECT username, password FROM users WHERE username=? AND password=?`,
             {
                 type: QueryTypes.SELECT,
                 replacements: [userData.userName,
-                               userData.password]
+                userData.password]
             });
         
-        // Correct login credentials
+        /* Correct login credentials */
         if (user.length) {
             req.userData = userData;
             console.log(chalk.magenta.bold('---verifyUser complete. Calling next middlware---'));
@@ -127,14 +119,14 @@ const verifyUser = async (req, res, next) => {
             next();
         }
         else {
-            console.log(chalk.red.bold('Wrong login credentials'))
+            console.log(chalk.red.bold('Wrong login credentials'));
             res.sendStatus(403);
         }
     }
     catch (error) {
         console.log(error);
     }
-}
+};
 
 /**
  * Second middleware of '/login'.
@@ -146,14 +138,21 @@ const signJWTAndSendJSON = async (req, res, next) => {
     console.log(chalk.green.bold('---signJWTAndSendJSON---'));
 
     const validatedUser = req.userData;
-
+    
     jwt.sign({ validatedUser }, privateinfo.getSecret(), { expiresIn: privateinfo.getExpiration() }, (error, token) => {
-        res.json({
-            "data": [token]
-        });
-        console.log(chalk.green.bold('---signJWTAndSendJSON complete. Token Sent Successfully!---'));
+
+        if (token) {
+            res.json({
+                'data': [token]
+            });
+            console.log(chalk.green.bold('---signJWTAndSendJSON complete. Token Sent Successfully!---'));
+        }
+        else {
+            console.log('Error- ' + error);
+        }
+
     });
-}
+};
 
 /**
  * Method gets called on '/users'.
@@ -163,7 +162,7 @@ const getAllUsers = async (req, res, next) => {
     try {
         const users = await sequelize.query('SELECT * FROM users', { type: QueryTypes.SELECT });
 
-        // returns JSON 
+    /* returns JSON  */
         res.send(users);
     }
     catch (err) {
@@ -178,8 +177,6 @@ const getAllUsers = async (req, res, next) => {
 const postNewUser = async (req, res, next) => {
 
     console.log(chalk.green.bold('Entered POST: create new user'));
-
-    // html should use <form></form> for this to work!
     try {
         const user = {
             firstName: req.body.firstName,
@@ -189,33 +186,25 @@ const postNewUser = async (req, res, next) => {
             password: req.body.password
         };
 
-        const existingUser = await userExistsInDB(user.userName)
+        const existingUser = await userExistsInDB(user.userName);
 
-        // User does not exists. Creating new user
+    /* User does not exists. Creating new user */
         if (!existingUser.length) { 
 
             console.log(chalk.green.bold('Creating new user'));
+            const results = insertUserToDB(user);
 
-            const [results, meta] = await sequelize.query(
-                `INSERT INTO users (firstName, lastName, email, userName, password) VALUES (?, ?, ?, ?, ?)`,
-                {
-                    type: QueryTypes.INSERT,
-                    replacements: [user.firstName,
-                                   user.lastName,
-                                   user.email,
-                                   user.userName,
-                                   user.password]
-                });
             results[0] = user;
             res.json({
                 data: results
-            })
+            });
         }
-        else { // User exists. bassa
-            console.log(chalk.red.bold('User Already exists in databse: ' + existingUser));
+        else {
+            console.log(chalk.red.bold('User Already exists in databse:'));
+            console.log(existingUser);
             res.json({
                 userAlreadyExists: true
-            })
+            });
         }
     }
     catch (err) {
@@ -223,22 +212,36 @@ const postNewUser = async (req, res, next) => {
     }
 };
 
+const insertUserToDB = async (user) => {
+    const [results, meta] = await sequelize.query(
+        `INSERT INTO users (firstName, lastName, email, userName, password) VALUES (?, ?, ?, ?, ?)`,
+        {
+            type: QueryTypes.INSERT,
+            replacements: [
+                user.firstName,
+                user.lastName,
+                user.email,
+                user.userName,
+                user.password
+            ]
+        });
+    console.log(results);
+    return results;
+};
+
 /**
  * Checks if user exists in database.
  */
 const userExistsInDB = async (userName) => {
-    // Check if username is taken
     const existingUser = await sequelize.query(
         `SELECT username FROM users WHERE username=?`,
         {
             type: QueryTypes.SELECT,
             replacements: [userName]
         });
-    
     return existingUser;
 }
 
-// Exports
 module.exports = {
     getAllUsers: getAllUsers,
     postNewUser: postNewUser,

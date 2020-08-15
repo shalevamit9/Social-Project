@@ -1,17 +1,19 @@
-// Requires
+/*jshint ignore:start*/
+
+/* Requires */
 const express = require('express');
 const usersRoutes = require('./routes/users');
 const bodyParser = require('body-parser');
 
-// Initialize server
+/* Initialize server */
 const app = express();
 
-// Parsing middlewares
+/* Parsing middlewares */
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// Getting routes
+/* Getting routes */
 app.use(usersRoutes);
 
-// Run
+/* Run */
 app.listen(3000, ()=> console.log('Server started on port 3000'))

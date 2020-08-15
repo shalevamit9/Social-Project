@@ -1,21 +1,23 @@
+/*jshint ignore:start*/
+
 const express = require('express'); 
 const path = require('path'); 
 
-// Controller methods
+/* Controller methods */
 const usersController = require('../controllers/users');
 
-// For handling routing
+/* For handling routing */
 const router = express.Router();
 
-// Landing page
+/* Landing page */
 router.get('/', (req, res, next) => {
     res.sendFile(path.join(__dirname, '..', 'testHTML.html'));
 });
 
-// Returns JSON of all users
+/* Returns JSON of all users */
 router.get('/users', usersController.formatAndSetToken, usersController.verifyToken,  usersController.getAllUsers);
 
-// Create new user
+/* Create new user */
 router.post('/users/:id', usersController.postNewUser);
 
 /**
