@@ -5,31 +5,19 @@
  * and methods that access the database.
  */
 
+require('dotenv').config();
+
 const { QueryTypes } = require('sequelize');
 const jwt = require('jsonwebtoken'); 
 const chalk = require('chalk');
 
+
 /* Importing the pool. */
 const sequelize = require('../utils/database');
 
-const privateinfo = (function () {
+// const privateinfo = (function () {
 
     
-    /* Secret for signing JWT */
-    const secret = '42C20602620F2E33BAA6794FA1550D6F747C5526A8F89A7ED9C92D6718E62B64';
-
-    /* Miliseconds */
-    const Expiration = 10000;
-
-    return {
-        getSecret: () => {
-            return secret;
-        }, 
-        getExpiration: () => {
-            return Expiration;
-        }
-    };
-})();
 
 /**
  * Verifies token from user using 'jwt.verify'.
@@ -41,7 +29,7 @@ const verifyToken = async (req, res, next) => {
     console.log(chalk.magenta.bold('---verifyToken---'));
 
     try {
-        jwt.verify(req.token, privateinfo.getSecret(), (error, data) => {
+        jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, (error, data) => {
 
             if (data) {
                 console.log(chalk.green.bold('verifyToken complete. Calling next middleware.'));
@@ -138,13 +126,11 @@ const signJWTAndSendJSON = async (req, res, next) => {
     console.log(chalk.green.bold('---signJWTAndSendJSON---'));
 
     const validatedUser = req.userData;
-    
-    jwt.sign({ validatedUser }, privateinfo.getSecret(), { expiresIn: privateinfo.getExpiration() }, (error, token) => {
+
+    jwt.sign({ validatedUser }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '10m' }, (error, token) => {
 
         if (token) {
-            res.json({
-                'data': [token]
-            });
+            res.json({'token': [token]});
             console.log(chalk.green.bold('---signJWTAndSendJSON complete. Token Sent Successfully!---'));
         }
         else {
