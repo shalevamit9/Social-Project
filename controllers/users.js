@@ -5,19 +5,16 @@
  * and methods that access the database.
  */
 
+/* Create secret by running in node:
+   require('crypto').randomBytes(64).toString('hex') */
 require('dotenv').config();
 
 const { QueryTypes } = require('sequelize');
 const jwt = require('jsonwebtoken'); 
 const chalk = require('chalk');
 
-
 /* Importing the pool. */
 const sequelize = require('../utils/database');
-
-// const privateinfo = (function () {
-
-    
 
 /**
  * Verifies token from user using 'jwt.verify'.
