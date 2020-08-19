@@ -169,7 +169,7 @@ const postNewUser = async (req, res, next) => {
             password: req.body.password
         };
 
-        const existingUser = await userExistsInDB(user.userName);
+        const existingUser = await pullUserFromDB(user.userName);
 
     /* User does not exists. Creating new user */
         if (!existingUser.length) { 
@@ -215,14 +215,97 @@ const insertUserToDB = async (user) => {
 /**
  * Checks if user exists in database.
  */
-const userExistsInDB = async (userName) => {
+const pullUserFromDB = async (user_id) => {
     const existingUser = await sequelize.query(
-        `SELECT username FROM users WHERE username=?`,
+        `SELECT user_id FROM User WHERE user_id=?`,
         {
             type: QueryTypes.SELECT,
-            replacements: [userName]
+            replacements: [user_id]
         });
     return existingUser;
+}
+
+const isUserInDB = async (user_id) => {
+    const existingUser = await pullUserFromDB(user_id);
+    let result;
+
+    if (existingUser.length === 0) {
+        result = false;
+    }
+    else {
+        result = true;
+    }
+
+    return result;
+}
+
+const updateUserInDB = async (req, res, next) => {
+    try {
+        const user = {
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            email: req.body.email,
+            userType: req.body.userType,
+            contactUser: req.body.contactUser
+        };
+
+        const userID = req.params.id;
+        const isUserExistsInDB = await isUserInDB(userID);
+        if (isUserExistsInDB) {
+            await sequelize.query(
+                `UPDATE User SET first_name = ?, last_name = ?, email = ?, type, = ?, contactUser = ? WHERE user_id = ?`,
+                {
+                    type: QueryTypes.UPDATE,
+                    replacements: [firstName,
+                        lastName,
+                        email,
+                        userType,
+                        contactUser,
+                        userID]
+                }
+            );
+
+            // Add id to object
+            res.json([{
+                id: user_id,
+                ...user
+            }]);
+        }
+    }
+    catch (error) {
+        res.sendStatus(401);
+        console.log(error);
+    }    
+}
+
+const deleteUserFromDB = async (req, res, next) => {
+    try {
+        const userID = req.params.id;
+        const isUserInDB = await isUserInDB(userID);
+        let result = false;
+    
+        if (isUserInDB) {
+           const queryResult = await sequelize.query(
+                `DELETE FROM User WHERE user_id = ?`,
+                {
+                    type: QueryTypes.DELETE,
+                    replacements: [userID]
+                }
+            );  
+            
+            if (queryResult.affectedRows > 0) {
+                result = true;
+            }            
+        }        
+        
+        res.json({
+            data: result
+        });        
+    }
+    catch (error) {
+        res.sendStatus(401);
+        console.log(error);
+    }
 }
 
 module.exports = {
@@ -231,5 +314,7 @@ module.exports = {
     signJWTAndSendJSON: signJWTAndSendJSON,
     verifyUser: verifyUser,
     formatAndSetToken: formatAndSetToken,
-    verifyToken: verifyToken
+    verifyToken: verifyToken,
+    updateUserInDB: updateUserInDB,
+    deleteUserFromDB: deleteUserFromDB
 };
