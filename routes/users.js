@@ -5,32 +5,33 @@ const path = require('path');
 
 /* Controller methods */
 const usersController = require('../controllers/users');
+const authorization = require('../middleware/authorization');
+const validation = require('../middleware/validation');
 
 /* For handling routing */
 const router = express.Router();
 
-/* Landing page */
-router.get('/', (req, res, next) => {
-    res.sendFile(path.join(__dirname, '..', 'testHTML.html'));
-});
-
-/* Returns JSON of all users */
-router.get('/users', usersController.formatAndSetToken, usersController.verifyToken, usersController.getAllUsers);
+/** Returns JSON of all users
+ * Creates new user --> sign up
+ */
+router.get('/users', authorization.formatAndSetToken, authorization.verifyToken, usersController.getAllUsers);
 
 /* Create new user */
-router.post('/users/:id', usersController.postNewUser);
+router.post('/users', usersController.signup);
 
 /**
  * 1. Verify user
  * 2. Sign token
- * 3. send token back as json
+ * 3. send token back as jsons
  */
-router.post('/login', usersController.verifyUser, usersController.signJWTAndSendJSON);
+router.post('/login', validation.verifyUser, authorization.signJWTandSendToken);
+
+router.post('/logout', authorization.formatAndSetToken, authorization.verifyToken, authorization.invalidateToken);
 
 /* Update User in DB */
-router.patch('/users/:id', usersController.verifyToken, usersController.updateUserInDB);
+router.patch('/users/:id', authorization.formatAndSetToken, authorization.verifyToken, usersController.updateUser);
 
 /* Delete User from DB */
-router.delete('/users/:id', usersController.verifyToken, usersController.deleteUserFromDB);
+router.delete('/users/:id', authorization.formatAndSetToken, authorization.verifyToken, usersController.deleteUser);
 
 module.exports = router;
