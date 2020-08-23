@@ -1,6 +1,8 @@
+require('dotenv').config();
+
 // Requires
 const express = require('express');
-const sequelize = require('./utils/database');
+const db = require('./utils/database');
 const usersRoutes = require('./routes/users');
 const bodyParser = require('body-parser');
 
@@ -8,15 +10,18 @@ const bodyParser = require('body-parser');
 const app = express();
 
 // Endpoints
-// app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 app.use(usersRoutes);
 
+app.use((error, req, res, next) => {
+    console.log(error);
+    const status = error.statusCode || 500;
+    const message = error.message;
 
-// app.use('/', (req, res, next) => {
-//    res.
-// });
+    res.status(status).json({ message: message });
+});
 
 // Listening
-app.listen(3000);
+app.listen(process.env.PORT || 3000);
