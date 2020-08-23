@@ -13,7 +13,7 @@ const { QueryTypes } = require('sequelize');
 const jwt = require('jsonwebtoken'); 
 const chalk = require('chalk');
 
-/* Importing the pool. */
+/* Importing the pool */
 const sequelize = require('../utils/database');
 
 /**
