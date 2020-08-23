@@ -1,3 +1,5 @@
+/*jshint ignore:start*/
+
 /**
  * Need this to connect to our PostgreSQL databse.
  */
@@ -6,7 +8,7 @@
 // const sequelize = new Sequelize(process.env.DATABASE_URI);
 
 // module.exports = sequelize;
-// require('dotenv').config();
+require('dotenv').config();
 
 const { Pool } = require('pg');
 

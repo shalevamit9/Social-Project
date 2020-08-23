@@ -1,3 +1,5 @@
+/*jshint ignore:start*/
+
 const db = require('./database');
 
 /**
@@ -20,9 +22,9 @@ const getAllUsersFromDB = async () => {
 const insertUserToDB = async (user) => {
     try {
         const results = await db.query(
-            'INSERT INTO users (user_id, first_name, last_name, password, birth_date, type, position, picture, phone, last_login, mail, contacts) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 ,$11, $12)',
+            'INSERT INTO users (user_id, first_name, last_name, password, birth_date, user_type, position, picture, phone, last_login, email, contact_user) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 ,$11, $12)',
             [
-                user.id,
+                user.ID,
                 user.firstName,
                 user.lastName,
                 user.password,
@@ -47,11 +49,11 @@ const insertUserToDB = async (user) => {
 /**
  * Find and return a user by user_id
  */
-const getUserById = async (userId) => {
+const getUserById = async (userID) => {
     try {
-        const existingUser = await db.query(`SELECT * FROM users WHERE user_id=$1`, [userId]);
+        const result = await db.query(`SELECT * FROM users WHERE user_id=$1`, [userID]);
         // console.log(existingUser.rows[0]);
-        return existingUser.rows[0];
+        return result.rows[0];
     }
     catch (error) {
         throw error;
@@ -119,7 +121,7 @@ const insertLoginInfoToDB = async (user) => {
     try {
         const result = await db.query('INSERT INTO "login" (user_id, token, time, is_valid) VALUES($1, $2, $3, $4)',
             [
-                user.userId,
+                user.userID,
                 user.token,
                 user.time,
                 user.isValid
@@ -133,6 +135,26 @@ const insertLoginInfoToDB = async (user) => {
     }
 };
 
+const updateColumn = async (table, column, data, userID) => {
+    try {
+        await db.query(`UPDATE ${table} SET ${column} = ${data} WHERE user_id = ${userID}`);
+    }
+    catch (error) {
+        throw error;
+    }
+};
+
+const getAllInfoFromTable = async (table) => {
+    try {
+        const result = await db.query(`SELECT * FROM ${table}`);
+
+        return result.rows;
+    }
+    catch (error) {
+        throw error;
+    }
+};
+
 module.exports = {
     getAllUsersFromDB: getAllUsersFromDB,
     insertUserToDB: insertUserToDB,
@@ -140,5 +162,7 @@ module.exports = {
     isUserInDB: isUserInDB,
     updateUserInDB: updateUserInDB,
     deleteUserFromDB: deleteUserFromDB,
-    insertLoginInfoToDB: insertLoginInfoToDB
+    insertLoginInfoToDB: insertLoginInfoToDB,
+    updateColumn: updateColumn,
+    getAllInfoFromTable: getAllInfoFromTable
 };

@@ -1,3 +1,5 @@
+/*jshint ignore:start*/
+
 const jwt = require('jsonwebtoken');
 
 const errorHandler = require('../utils/errors');
@@ -41,12 +43,13 @@ const verifyToken = async (req, res, next) => {
 
     try {
         const decodedToken = jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET);
-
+        // need to verify !isvalid
         if (!decodedToken) {
             throw errorHandler('Unauthorized', 401);
         }
-
-        next()
+        
+        req.userID = decodedToken.userID;
+        next();
     }
     catch (err) {
         // console.log(chalk.red.bold('verifyToken failed: ' + err));

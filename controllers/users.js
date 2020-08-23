@@ -41,26 +41,25 @@ const getAllUsers = async (req, res, next) => {
  * Gets validated login credentials from previous middleware.
  * Signs token, and sends it back in JSON format.
  */
-const login = async (req, res, next) => {
-    // console.log(chalk.green.bold('---signJWTAndSendJSON---'));
+const signJWTandSendToken = async (req, res, next) => {
 
     // const validatedUser = req.userData;
-    const userName = req.userData.userName;
+    const userID = req.userData.userID;
     
     try {
-        const token = jwt.sign({ userName: userName }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userID: userID }, process.env.ACCESS_TOKEN_SECRET);
         
         if (!token) {
             throw errorHandler('Cannot generate token', 500);
         }
 
         const user = {
-            userId: userName,
+            userID: userID,
             token: token,
             time: new Date(Date.now()),
             isValid: true
         };
-        const numberOfRowsInserted = await usersQueries.insertLoginInfoToDB(user);
+        await usersQueries.insertLoginInfoToDB(user);
 
         res.json({ token: [{ token: token }] });
     }
@@ -68,6 +67,22 @@ const login = async (req, res, next) => {
         next(error);
     }
 };
+
+const invalidateToken = async (req, res, next) => {
+    try {
+        const userID = req.userID;
+        await usersQueries.updateColumn('login', 'is_valid', 'FALSE', userID);
+
+        res.status(200);
+        res.json({
+            message: "logout complete"
+        })
+        console.log(chalk.green.bold('FUCK KANZIE'));
+    }
+    catch (error) {
+        next(error);
+    }
+}
 
 /**
  * Method gets called on '/users/:id'. The id is given.
@@ -82,7 +97,7 @@ const signup = async (req, res, next) => {
         }
 
         const user = {
-            id: req.body.id,
+            ID: req.body.id,
             firstName: req.body.firstName,
             lastName: req.body.lastName,
             email: req.body.email,
@@ -92,7 +107,7 @@ const signup = async (req, res, next) => {
             lastLogin: null
         };
 
-        const existingUser = await usersQueries.getUserById(user.id);
+        const existingUser = await usersQueries.getUserById(user.ID);
 
         /* User already exists error */
         if (existingUser) {
@@ -102,13 +117,14 @@ const signup = async (req, res, next) => {
             //     userAlreadyExists: true
             // });
 
+            /* not sure what to return */
             throw errorHandler('User already exists', 409);
         }
             
         /* User does not exists. Creating new user */
         // console.log(chalk.green.bold('Creating new user'));
-        const hasedPassword = await bcrypt.hash(user.password, 8);
-        user.password = hasedPassword;
+        const hashedPassword = await bcrypt.hash(user.password, 8);
+        user.password = hashedPassword;
         const numberOfUsersInserted = await usersQueries.insertUserToDB(user);
 
         res.json({
@@ -177,7 +193,8 @@ const deleteUser = async (req, res, next) => {
 module.exports = {
     getAllUsers: getAllUsers,
     signup: signup,
-    login: login,
+    signJWTandSendToken: signJWTandSendToken,
+    invalidateToken: invalidateToken,
     updateUser: updateUser,
     deleteUser: deleteUser
 };

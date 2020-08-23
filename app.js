@@ -3,6 +3,7 @@ require('dotenv').config();
 // Requires
 const express = require('express');
 const db = require('./utils/database');
+const committeeRoutes = require('./routes/committee');
 const usersRoutes = require('./routes/users');
 const bodyParser = require('body-parser');
 
@@ -14,6 +15,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(usersRoutes);
+app.use(committeeRoutes);
 
 app.use((error, req, res, next) => {
     console.log(error);

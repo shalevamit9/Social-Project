@@ -1,4 +1,5 @@
 /*jshint ignore:start*/
+
 const express = require('express');
 const { body } = require('express-validator');
 
@@ -10,7 +11,9 @@ const validation = require('../middleware/validation');
 /* For handling routing */
 const router = express.Router();
 
-/* Returns JSON of all users */
+/** Returns JSON of all users
+ * Creates new user --> sign up
+ */
 router.get('/users', authorization.formatAndSetToken, authorization.verifyToken, usersController.getAllUsers);
 
 /* Create new user */
@@ -26,7 +29,9 @@ router.post('/users',
  * 2. Sign token
  * 3. send token back as json
  */
-router.post('/login', validation.verifyUser, usersController.login);
+router.post('/login', validation.verifyUser, usersController.signJWTandSendToken);
+
+router.post('/logout', authorization.formatAndSetToken, authorization.verifyToken, usersController.invalidateToken);
 
 /* Update User in DB */
 router.patch('/users/:id', authorization.formatAndSetToken, authorization.verifyToken, usersController.updateUser);
