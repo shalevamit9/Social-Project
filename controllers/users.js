@@ -34,6 +34,7 @@ const verifyToken = async (req, res, next) => {
             }
             else {
                 console.log(chalk.red.bold('Error- ' + error));
+            /* Not sure what to send here */
                 res.sendStatus(403);
             }
         });
@@ -66,6 +67,7 @@ const formatAndSetToken = async (req, res, next) => {
     }
     else {
         console.log(chalk.red.bold('forbidden'));
+    /* Not sure what to send here */
         res.sendStatus(403);
     }
 };
@@ -105,6 +107,7 @@ const verifyUser = async (req, res, next) => {
         }
         else {
             console.log(chalk.red.bold('Wrong login credentials'));
+            /* Not sure what to send here */
             res.sendStatus(403);
         }
     }
@@ -124,7 +127,7 @@ const signJWTAndSendJSON = async (req, res, next) => {
 
     const validatedUser = req.userData;
 
-    jwt.sign({ validatedUser }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '10m' }, (error, token) => {
+    jwt.sign({ validatedUser }, process.env.ACCESS_TOKEN_SECRET, (error, token) => {
 
         if (token) {
             res.json({'token': [token]});
@@ -162,17 +165,19 @@ const postNewUser = async (req, res, next) => {
     console.log(chalk.green.bold('Entered POST: create new user'));
     try {
         const user = {
+            ID: req.body.id,
             firstName: req.body.firstName,
             lastName: req.body.lastName,
             email: req.body.email,
-            userName: req.body.userName,
-            password: req.body.password
+            password: req.body.password,
+            userType: req.body.userType,
+            contactUser: req.body.contactUser
         };
 
-        const existingUser = await pullUserFromDB(user.userName);
+        const UserExists = await isUserInDB(user.ID);
 
     /* User does not exists. Creating new user */
-        if (!existingUser.length) { 
+        if (!UserExists) { 
 
             console.log(chalk.green.bold('Creating new user'));
             const results = insertUserToDB(user);
@@ -184,8 +189,8 @@ const postNewUser = async (req, res, next) => {
         }
         else {
             console.log(chalk.red.bold('User Already exists in databse:'));
-            console.log(existingUser);
             res.json({
+                /* Not sure what to do here */
                 userAlreadyExists: true
             });
         }
@@ -197,15 +202,17 @@ const postNewUser = async (req, res, next) => {
 
 const insertUserToDB = async (user) => {
     const [results, meta] = await sequelize.query(
-        `INSERT INTO users (firstName, lastName, email, userName, password) VALUES (?, ?, ?, ?, ?)`,
+        `INSERT INTO users (ID ,firstName, lastName, email, password, userType, contactUser) VALUES (?, ?, ?, ?, ?, ?, ?)`,
         {
             type: QueryTypes.INSERT,
             replacements: [
+                user.ID,
                 user.firstName,
                 user.lastName,
                 user.email,
-                user.userName,
-                user.password
+                user.password,
+                user.userType,
+                contactUser
             ]
         });
     console.log(results);
@@ -213,7 +220,7 @@ const insertUserToDB = async (user) => {
 };
 
 /**
- * Checks if user exists in database.
+ *  Pulls user from database.
  */
 const pullUserFromDB = async (user_id) => {
     const existingUser = await sequelize.query(
@@ -225,6 +232,9 @@ const pullUserFromDB = async (user_id) => {
     return existingUser;
 }
 
+/**
+ * Checks if user exists in database.
+ */
 const isUserInDB = async (user_id) => {
     const existingUser = await pullUserFromDB(user_id);
     let result;
@@ -273,6 +283,7 @@ const updateUserInDB = async (req, res, next) => {
         }
     }
     catch (error) {
+    /* Not sure what to send here */
         res.sendStatus(401);
         console.log(error);
     }    
@@ -303,6 +314,7 @@ const deleteUserFromDB = async (req, res, next) => {
         });        
     }
     catch (error) {
+    /* Not sure what to send here */
         res.sendStatus(401);
         console.log(error);
     }
