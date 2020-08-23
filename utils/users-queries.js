@@ -51,8 +51,10 @@ const insertUserToDB = async (user) => {
  */
 const getUserById = async (userID) => {
     try {
+
         const result = await db.query(`SELECT * FROM users WHERE user_id=$1`, [userID]);
         // console.log(existingUser.rows[0]);
+
         return result.rows[0];
     }
     catch (error) {
@@ -80,14 +82,14 @@ const isUserInDB = async (userId) => {
 const updateUserInDB = async (user) => {
     try {
         const result = await db.query(
-            'UPDATE users SET first_name = $1, last_name = $2, mail = $3, type = $4, contacts = $5 WHERE user_id = $6',
+            'UPDATE users SET first_name = $1, last_name = $2, email = $3, user_type = $4, contact_user = $5 WHERE user_id = $6',
             [
                 user.firstName,
                 user.lastName,
                 user.email,
                 user.userType,
                 user.contactUser,
-                user.id
+                user.ID
             ]
         );
 

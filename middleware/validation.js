@@ -14,7 +14,6 @@ const errorHandler = require('../utils/errors');
  */
 const verifyUser = async (req, res, next) => {
     // console.log(chalk.magenta.bold('---verifyUser---'));
-
     try {
         /* Get userName and password from req.body */
         const userData = {
@@ -23,7 +22,6 @@ const verifyUser = async (req, res, next) => {
         };
 
         /* Query for getting credentials from Database */
-        // const user = await db.query(`SELECT * FROM users WHERE user_id=?`, [userData.userName]);
         const queryUser = await userQueries.getUserById(userData.userID);
 
         /* Correct login credentials */
