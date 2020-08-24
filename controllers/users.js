@@ -11,8 +11,7 @@ const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 
 /* Importing the pool. */
-// const sequelize = require('../utils/database');
-const db = require('../utils/database');
+// const db = require('../utils/database');
 const usersQueries = require('../utils/users-queries');
 const errorHandler = require('../utils/errors');
 
@@ -23,12 +22,12 @@ const errorHandler = require('../utils/errors');
 const signup = async (req, res, next) => {
     // console.log(chalk.green.bold('Entered POST: create new user'));
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            throw errorHandler('Validation failed, entered data is incorrect.', 422);
-        }
+        // const errors = validationResult(req);
+        // if (!errors.isEmpty()) {
+        //     throw errorHandler('Validation failed, entered data is incorrect.', 422);
+        // }
 
-        const user = {
+        const newUser = {
             ID: req.body.id,
             firstName: req.body.firstName,
             lastName: req.body.lastName,
@@ -39,7 +38,7 @@ const signup = async (req, res, next) => {
             lastLogin: null
         };
 
-        const existingUser = await usersQueries.getUserById(user.ID);
+        const existingUser = await usersQueries.getUserById(newUser.ID);
 
         /* User already exists error */
         if (existingUser) {
@@ -49,16 +48,16 @@ const signup = async (req, res, next) => {
         }
             
         /* User does not exists. Creating new user */
-        const hashedPassword = await bcrypt.hash(user.password, 8);
-        user.password = hashedPassword;
-        await usersQueries.insertUserToDB(user);
+        const hashedPassword = await bcrypt.hash(newUser.password, 8);
+        newUser.password = hashedPassword;
+        await usersQueries.insertUserToDB(newUser);
 
         res.json({
-            data: user
+            data: newUser
         });
     }
-    catch (err) {
-        next(err);
+    catch (error) {
+        next(error);
     }
 };
 

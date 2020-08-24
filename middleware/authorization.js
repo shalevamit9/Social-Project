@@ -1,9 +1,8 @@
 /*jshint ignore:start*/
 
 const jwt = require('jsonwebtoken');
-
-const errorHandler = require('../utils/errors');
 const usersQueries = require('../utils/users-queries');
+const errorHandler = require('../utils/errors');
 
 /**
  * Gets bearer token from req.headers (authorization section).
