@@ -16,7 +16,7 @@ const router = express.Router();
 router.get('/users', authorization.formatAndSetToken, authorization.verifyToken, usersController.getAllUsers);
 
 /* Creates new user */
-router.post('/users', usersController.signup);
+router.post('/users', usersController.createNewUser);
 
 /**
  * User credentials are verified. If credentials are valid,

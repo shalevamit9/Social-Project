@@ -1,11 +1,11 @@
 /*jshint ignore:start*/
 
-const usersQueries = require('../utils/users-queries');
+const queries = require('../utils/queries');
 
 const getAllCommitteeParticipants = async (req, res, next) => {
     try {
         const tableName = 'committee_participants';
-        const result = await usersQueries.getAllInfoFromTable(tableName);
+        const result = await queries.getAllInfoFromTable(tableName);
 
         res.status(200);
         res.json({ result: result });
@@ -15,6 +15,26 @@ const getAllCommitteeParticipants = async (req, res, next) => {
     }
 }
 
+/* const createNewChairPerson = async (req, res, next) => {
+    try {
+        const newChairPerson = {
+            ID: req.body.id,
+            name: req.body.name,
+            role: req.body.role,
+            phone: req.body.phone,
+            email: req.body.email
+        }
+
+
+        
+    
+    }
+    catch{
+
+    }
+} */
+
 module.exports = {
-    getAllCommitteeParticipants: getAllCommitteeParticipants
+    getAllCommitteeParticipants: getAllCommitteeParticipants,
+    // createNewChairPerson: createNewChairPerson
 }

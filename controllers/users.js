@@ -7,26 +7,17 @@
 
 require('dotenv').config();
 
-const { validationResult } = require('express-validator');
-const bcrypt = require('bcryptjs');
-
 /* Importing the pool. */
 // const db = require('../utils/database');
-const usersQueries = require('../utils/users-queries');
+const queries = require('../utils/queries');
 const errorHandler = require('../utils/errors');
 
 /**
  * Method gets called on '/users/:id'. The id is given.
  * Creates new user and inserts the user to the database.
  */
-const signup = async (req, res, next) => {
-    // console.log(chalk.green.bold('Entered POST: create new user'));
+const createNewUser = async (req, res, next) => {
     try {
-        // const errors = validationResult(req);
-        // if (!errors.isEmpty()) {
-        //     throw errorHandler('Validation failed, entered data is incorrect.', 422);
-        // }
-
         const newUser = {
             ID: req.body.id,
             firstName: req.body.firstName,
@@ -38,7 +29,7 @@ const signup = async (req, res, next) => {
             lastLogin: null
         };
 
-        const existingUser = await usersQueries.getUserById(newUser.ID);
+        const existingUser = await queries.getUserById(newUser.ID);
 
         /* User already exists error */
         if (existingUser) {
@@ -48,9 +39,7 @@ const signup = async (req, res, next) => {
         }
             
         /* User does not exists. Creating new user */
-        const hashedPassword = await bcrypt.hash(newUser.password, 8);
-        newUser.password = hashedPassword;
-        await usersQueries.insertUserToDB(newUser);
+        await queries.insertUserToDB(newUser);
 
         res.json({
             data: newUser
@@ -67,7 +56,7 @@ const signup = async (req, res, next) => {
  */
 const getAllUsers = async (req, res, next) => {
     try {
-        const users = await usersQueries.getAllUsersFromDB();
+        const users = await queries.getAllUsersFromDB();
         res.json({ users: users });
     }
     catch (error) {
@@ -88,12 +77,12 @@ const updateUser = async (req, res, next) => {
         };
 
         // const userId = req.params.id;
-        const isUserExistsInDB = await usersQueries.isUserInDB(user.ID);
+        const isUserExistsInDB = await queries.isUserInDB(user.ID);
         if (!isUserExistsInDB) {
             throw errorHandler('Could not find the user in database', 404);
         }
 
-        await usersQueries.updateUserInDB(user);
+        await queries.updateUserInDB(user);
 
         res.json([user]);
     }
@@ -107,13 +96,13 @@ const updateUser = async (req, res, next) => {
 const deleteUser = async (req, res, next) => {
     try {
         const userId = req.params.id;
-        const isUserExistsInDB = await usersQueries.isUserInDB(userId);
+        const isUserExistsInDB = await queries.isUserInDB(userId);
 
         if (!isUserExistsInDB) {
             throw errorHandler('Could not find the user in database', 404);
         }
 
-        const isUserDeleted = await usersQueries.deleteUserFromDB(userId);
+        const isUserDeleted = await queries.deleteUserFromDB(userId);
 
         if (!isUserDeleted) {
             throw errorHandler('Could not delete user', 500);
@@ -131,7 +120,7 @@ const deleteUser = async (req, res, next) => {
 }
 
 module.exports = {
-    signup: signup,
+    createNewUser: createNewUser,
     updateUser: updateUser,
     deleteUser: deleteUser,
     getAllUsers: getAllUsers

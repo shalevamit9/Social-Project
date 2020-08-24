@@ -157,6 +157,25 @@ const getAllInfoFromTable = async (table) => {
     }
 };
 
+const insertNewApplication = async (application) => {
+    try {
+        const result = await db.query(
+            `INSERT INTO inbox 
+            (receiver, sender, subject, content, time) 
+            VALUES
+            (${application.receiver}, 
+             ${application.sender}, 
+             ${application.subject}, 
+             ${application.content},
+             ${application.time})`); 
+        
+        return result.rowCount !== 0;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
 module.exports = {
     getAllUsersFromDB: getAllUsersFromDB,
     insertUserToDB: insertUserToDB,
@@ -166,5 +185,6 @@ module.exports = {
     deleteUserFromDB: deleteUserFromDB,
     insertLoginInfoToDB: insertLoginInfoToDB,
     updateColumn: updateColumn,
-    getAllInfoFromTable: getAllInfoFromTable
+    getAllInfoFromTable: getAllInfoFromTable,
+    insertNewApplication: insertNewApplication
 };

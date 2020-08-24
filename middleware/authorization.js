@@ -1,7 +1,7 @@
 /*jshint ignore:start*/
 
 const jwt = require('jsonwebtoken');
-const usersQueries = require('../utils/users-queries');
+const queries = require('../utils/queries');
 const errorHandler = require('../utils/errors');
 
 /**
@@ -51,7 +51,7 @@ const signJWTandSendToken = async (req, res, next) => {
             time: new Date(Date.now()),
             isValid: true
         };
-        await usersQueries.insertLoginInfoToDB(user);
+        await queries.insertLoginInfoToDB(user);
 
         res.json({ token: [{ token: token }] });
     }
@@ -86,7 +86,7 @@ const verifyToken = async (req, res, next) => {
 const invalidateToken = async (req, res, next) => {
     try {
         const userID = req.userID;
-        await usersQueries.updateColumn('login', 'is_valid', 'FALSE', userID);
+        await queries.updateColumn('login', 'is_valid', 'FALSE', userID);
 
         res.status(200);
         res.json({
