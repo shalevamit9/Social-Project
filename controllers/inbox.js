@@ -16,7 +16,7 @@ const createNewApplication = async (req, res, next) => {
 
         const result = await queries.insertNewApplication(newApplication);
         if (!result) {
-            throw errorHandler('Failed to insert application', 500);
+            throw errorHandler('Failed', 500);
         }
 
         res.status(201);

@@ -10,7 +10,7 @@ const committeeRoutes = require('./routes/committee');
 /* Initialize server */
 const app = express();
 
-/* secure headers */
+/* Secure headers */
 app.use(helmet());
 
 /* Parsing middlewares */

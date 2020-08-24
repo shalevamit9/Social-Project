@@ -24,17 +24,13 @@ const getAllCommitteeParticipants = async (req, res, next) => {
             phone: req.body.phone,
             email: req.body.email
         }
-
-
-        
-    
     }
     catch{
 
     }
-} */
-
+}
+ */
 module.exports = {
     getAllCommitteeParticipants: getAllCommitteeParticipants,
-    // createNewChairPerson: createNewChairPerson
+    createNewChairPerson: createNewChairPerson,
 }
