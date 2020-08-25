@@ -2,7 +2,7 @@
 
 ## Controller folder
 
-This folder contains:
+This folder contains the following files:
 
 `committee.js` - controlls committee related operations.
 
