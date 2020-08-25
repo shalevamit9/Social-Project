@@ -121,7 +121,8 @@ const deleteUserFromDB = async (userId) => {
  */
 const insertLoginInfoToDB = async (user) => {
     try {
-        const result = await db.query('INSERT INTO "login" (user_id, token, time, is_valid) VALUES($1, $2, $3, $4)',
+        const result = await db.query(
+            'INSERT INTO "login" (user_id, token, time, is_valid) VALUES($1, $2, $3, $4)',
             [
                 user.userID,
                 user.token,
