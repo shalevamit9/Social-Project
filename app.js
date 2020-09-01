@@ -2,7 +2,6 @@
 
 /* Requires */
 const express = require('express');
-const helmet = require("helmet");
 const bodyParser = require('body-parser');
 const usersRoutes = require('./routes/users');
 const committeeRoutes = require('./routes/committee');
@@ -10,8 +9,7 @@ const committeeRoutes = require('./routes/committee');
 /* Initialize server */
 const app = express();
 
-/* Secure headers */
-app.use(helmet());
+
 
 /* Parsing middlewares */
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -30,4 +28,4 @@ app.use((error, req, res, next) => {
 });
 
 // Listening
-app.listen(process.env.PORT || 3000);
+app.listen(process.env.PORT || 4000);
