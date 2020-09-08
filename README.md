@@ -53,7 +53,7 @@ This folder contains:
 - `/login` - POST
 - `/logout` - POST
 - `/users/:id` - PATCH
-- `users/:id` - DELETE
+- `/users/:id` - DELETE
 
 ## Utilities Folder
 
