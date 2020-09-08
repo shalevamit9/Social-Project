@@ -3,6 +3,7 @@
 const jwt = require('jsonwebtoken');
 const queries = require('../utils/queries');
 const errorHandler = require('../utils/errors');
+const redis = require('../utils/redis');
 
 /**
  * Gets bearer token from req.headers (authorization section).
@@ -45,13 +46,13 @@ const signJWTandSendToken = async (req, res, next) => {
             throw errorHandler('Cannot generate token', 500);
         }
 
-        const user = {
-            userID: userID,
-            token: token,
-            time: new Date(Date.now()),
-            isValid: true
-        };
-        await queries.insertLoginInfoToDB(user);
+        // const user = {
+        //     userID: userID,
+        //     token: token,
+        //     time: new Date(Date.now()),
+        //     isValid: true
+        // };
+        // await queries.insertLoginInfoToDB(user);
 
         res.json({ token: [{ token: token }] });
     }
@@ -67,17 +68,21 @@ const signJWTandSendToken = async (req, res, next) => {
  * Else, sends 401 status (Unauthorized).
  */
 const verifyToken = async (req, res, next) => {
-
     try {
         const decodedToken = jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET);
-        const isValid = await queries.getTokenValidation(req.token);
 
-        if (!decodedToken || !isValid) {
-            throw errorHandler('Unauthorized', 401);
-        }
-        
-        req.userID = decodedToken.userID;
-        next();
+        redis.get(decodedToken.userID, function (err, data) {
+            if (err) {
+                throw err;
+            }
+
+            if (!decodedToken || data) {
+                throw errorHandler('Unauthorized', 401);
+            }
+
+            req.userID = decodedToken.userID;
+            next();
+        });
     }
     catch (err) {
         next(err);
@@ -87,13 +92,13 @@ const verifyToken = async (req, res, next) => {
 const invalidateToken = async (req, res, next) => {
     try {
         const userID = req.userID;
-        await queries.updateColumn('login', 'is_valid', 'FALSE', userID);
-
-        res.status(200);
-        res.json({
-            message: "logout complete"
-        })
-        console.log(chalk.green.bold('FUCK KANZIE'));
+        redis.setex(userID, 30, req.token, function (err, reply) {
+            console.log('fucked kanzie daughter successfully');
+            res.status(200);
+            res.json({
+                message: "logout complete"
+            });
+        });
     }
     catch (error) {
         next(error);

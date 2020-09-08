@@ -22,7 +22,7 @@ const getAllUsersFromDB = async () => {
 const insertUserToDB = async (user) => {
     try {
         const results = await db.query(
-            'INSERT INTO users (user_id, first_name, last_name, password, birth_date, user_type, position, picture, phone, last_login, email, contact_user) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 ,$11, $12)',
+            'INSERT INTO users (user_id, first_name, last_name, password, birth_date, type, position, picture, phone, last_login, mail, contacts) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 ,$11, $12)',
             [
                 user.ID,
                 user.firstName,
@@ -82,7 +82,7 @@ const isUserInDB = async (userId) => {
 const updateUserInDB = async (user) => {
     try {
         const result = await db.query(
-            'UPDATE users SET first_name = $1, last_name = $2, email = $3, user_type = $4, contact_user = $5 WHERE user_id = $6',
+            'UPDATE users SET first_name = $1, last_name = $2, mail = $3, type = $4, contacts = $5 WHERE user_id = $6',
             [
                 user.firstName,
                 user.lastName,

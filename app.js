@@ -2,14 +2,12 @@
 
 /* Requires */
 const express = require('express');
-const bodyParser = require('body-parser');
+const bodyParser = require('body-parser')
 const usersRoutes = require('./routes/users');
 const committeeRoutes = require('./routes/committee');
 
 /* Initialize server */
 const app = express();
-
-
 
 /* Parsing middlewares */
 app.use(bodyParser.urlencoded({ extended: true }));
