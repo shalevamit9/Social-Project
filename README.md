@@ -59,6 +59,6 @@ This folder contains:
 
 This folder contains:
 - PostgreSQL Database set up
-` Redis set up
+- Redis set up
 - Error handler
 - SQL queries
