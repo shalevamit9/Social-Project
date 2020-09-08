@@ -53,6 +53,7 @@ const createNewUser = async (req, res, next) => {
 /**
  * Method gets called on '/users'.
  * Returns all users in database in JSON format.
+ * If method fails, an error is emitted.
  */
 const getAllUsers = async (req, res, next) => {
     try {

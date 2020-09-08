@@ -53,7 +53,6 @@ const getUserById = async (userID) => {
     try {
 
         const result = await db.query(`SELECT * FROM users WHERE user_id=$1`, [userID]);
-        // console.log(existingUser.rows[0]);
 
         return result.rows[0];
     }
@@ -63,7 +62,7 @@ const getUserById = async (userID) => {
 };
 
 /**
- * Return true if the user with the userId exists in the database, return false otherwise
+ * Returns true if the user with the userId exists in the database, return false otherwise
  */
 const isUserInDB = async (userId) => {
     try {
@@ -102,7 +101,7 @@ const updateUserInDB = async (user) => {
 
 /**
  * A query that finds and delete a user from database by user_id,
- * and return true if the user has been deleted successfully,
+ * and returns true if the user has been deleted successfully,
  * false otherwise
  */
 const deleteUserFromDB = async (userId) => {

@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const queries = require('../utils/queries');
 const errorHandler = require('../utils/errors');
 const redis = require('../utils/redis');
-
+require('dotenv').config();
 /**
  * Gets bearer token from req.headers (authorization section).
  * 
@@ -62,18 +62,19 @@ const signJWTandSendToken = async (req, res, next) => {
 };
 
 /**
- * Verifies token from user using 'jwt.verify'.
+ * Verifies token from user using 'jwt.verify' and redis.
  * 
- * If user token is valid, grants access to requested webpage. 
- * Else, sends 401 status (Unauthorized).
+ * If user token is valid and not blacklisted, grants access to requested webpage. 
+ * IF token is invalid or blacklisted, the method emits 'Unauthorized' message
+ * alongside a '401' status code.
  */
 const verifyToken = async (req, res, next) => {
     try {
         const decodedToken = jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET);
 
-        redis.get(decodedToken.userID, function (err, data) {
-            if (err) {
-                throw err;
+        redis.get(decodedToken.userID, function (error, data) {
+            if (error) {
+                throw error;
             }
 
             if (!decodedToken || data) {
@@ -84,19 +85,26 @@ const verifyToken = async (req, res, next) => {
             next();
         });
     }
-    catch (err) {
-        next(err);
+    catch (error) {
+        next(error);
     }
 };
 
+/**
+ * This method invalidate the user's token.
+ * 
+ * The methods sets the user's ID and the token in a blacklist in redis.
+ * The method responds with a 'Logout complete' message alongside a '200' status code.
+ * If method fail, an error is emitted.
+ */
 const invalidateToken = async (req, res, next) => {
     try {
         const userID = req.userID;
-        redis.setex(userID, 30, req.token, function (err, reply) {
-            console.log('fucked kanzie daughter successfully');
+        redis.setex(userID, process.env.REDIS_TTL, req.token, function (err, reply) {
+            console.log('added to blacklist successfully');
             res.status(200);
             res.json({
-                message: "logout complete"
+                message: "Logout complete"
             });
         });
     }

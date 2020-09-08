@@ -1,3 +1,5 @@
+/*jshint ignore:start*/
+
 const redis = require("redis");
 const client = redis.createClient();
 
