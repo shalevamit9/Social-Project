@@ -22,7 +22,11 @@ const getAllUsersFromDB = async () => {
 const insertUserToDB = async (user) => {
     try {
         const results = await db.query(
-            'INSERT INTO users (user_id, first_name, last_name, password, birth_date, type, position, picture, phone, last_login, mail, contacts) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 ,$11, $12)',
+            `INSERT INTO 
+            users 
+            (user_id, first_name, last_name, password, birth_date, type, position, picture, phone, last_login, mail, contacts) 
+            VALUES 
+            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 ,$11, $12)`,
             [
                 user.ID,
                 user.firstName,
@@ -173,12 +177,15 @@ const insertNewApplication = async (application) => {
         const result = await db.query(
             `INSERT INTO inbox 
             (receiver, sender, subject, content, time) 
-            VALUES
-            (${application.receiver}, 
-             ${application.sender}, 
-             ${application.subject}, 
-             ${application.content},
-             ${application.time})`); 
+            VALUES ($1,$2,$3,$4,$5)`,
+            [
+                application.receiverID,
+                application.senderID,
+                application.subject,
+                application.content,
+                application.time
+            ]
+        );
         
         return result.rowCount !== 0;
     }

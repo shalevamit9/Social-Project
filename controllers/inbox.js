@@ -1,7 +1,6 @@
 const queries = require('../utils/queries');
 const errorHandler = require('../utils/errors');
 
-
 /**
  * This method returns application by id in JSON format.
  */
@@ -33,16 +32,15 @@ const getApplication = async (req, res, next) => {
  * Retrieves the new application's information and stores it in the database.
  */
 const createNewApplication = async (req, res, next) => {
-    
     try {
         const newApplication = {
             receiverID: req.body.receiver,
             senderID: req.body.sender,
             subject: req.body.subject,
             content: req.body.content,
-            time: req.time_and_date
-        }
-
+            time: new Date(Date.now())
+        };
+        
         const result = await queries.insertNewApplication(newApplication);
         if (!result) {
             throw errorHandler('Failed', 500);

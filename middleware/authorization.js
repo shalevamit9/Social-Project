@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const queries = require('../utils/queries');
 const errorHandler = require('../utils/errors');
 const redis = require('../utils/redis');
-require('dotenv').config();
 
 /**
  * Gets bearer token from req.headers (authorization section).
@@ -38,7 +37,9 @@ const signJWTandSendToken = async (req, res, next) => {
     const userID = req.userData.userID;
 
     try {
+        console.log('before sign');
         const token = jwt.sign({ userID: userID }, process.env.ACCESS_TOKEN_SECRET);
+        console.log('after sign');
 
         if (!token) {
             throw errorHandler('Cannot generate token', 500);
@@ -64,11 +65,11 @@ const verifyToken = async (req, res, next) => {
 
         redis.get(decodedToken.userID, function (error, data) {
             if (error) {
-                throw error;
+                next(error);
             }
-
+            console.log(data);
             if (!decodedToken || data) {
-                throw errorHandler('Unauthorized', 401);
+                next(errorHandler('Unauthorized', 401));
             }
 
             req.userID = decodedToken.userID;
@@ -91,7 +92,10 @@ const invalidateToken = async (req, res, next) => {
     try {
         const userID = req.userID;
         redis.setex(userID, process.env.REDIS_TTL, req.token, function (err, reply) {
-            console.log('added to blacklist successfully');
+            if (err) {
+                next(err);
+            }
+            
             res.status(200);
             res.json({
                 message: "Logout complete"

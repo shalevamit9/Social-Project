@@ -38,9 +38,7 @@ const createNewUser = async (req, res, next) => {
         /* User does not exists. Creating new user */
         await queries.insertUserToDB(newUser);
 
-        res.json({
-            data: newUser
-        });
+        res.json([newUser]);
     }
     catch (error) {
         next(error);
@@ -55,7 +53,7 @@ const createNewUser = async (req, res, next) => {
 const getAllUsers = async (req, res, next) => {
     try {
         const users = await queries.getAllUsersFromDB();
-        res.json({ users: users });
+        res.json(users);
     }
     catch (error) {
         next(error);

@@ -12,7 +12,7 @@ const verifyUser = async (req, res, next) => {
     try {
         /* Get userName and password from req.body */
         const userData = {
-            userID: req.body.userName,
+            userID: req.body.userID,
             password: req.body.password
         };
 

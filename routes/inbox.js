@@ -1,6 +1,5 @@
 const express = require('express'); 
 const authorization = require('../middleware/authorization');
-const validation = require('../middleware/validation');
 const inboxController = require('../controllers/inbox');
 
 /* For handling routing */

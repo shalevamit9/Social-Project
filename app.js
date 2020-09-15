@@ -1,8 +1,11 @@
+require('dotenv').config();
+
 /* Requires */
 const express = require('express');
 const bodyParser = require('body-parser')
 const usersRoutes = require('./routes/users');
 const committeeRoutes = require('./routes/committee');
+const inboxRoutes = require('./routes/inbox');
 
 /* Initialize server */
 const app = express();
@@ -14,6 +17,7 @@ app.use(bodyParser.json());
 /* Getting routes */
 app.use(usersRoutes);
 app.use(committeeRoutes);
+app.use(inboxRoutes);
 
 app.use((error, req, res, next) => {
     console.log(error);
