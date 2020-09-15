@@ -1,4 +1,5 @@
 # REST API Project
+Developed and tested by: Amit Shalev, Marko Katziv, Avishay Robinov
 
 ## Controller folder
 
