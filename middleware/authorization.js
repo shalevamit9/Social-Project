@@ -1,10 +1,9 @@
-/*jshint ignore:start*/
-
 const jwt = require('jsonwebtoken');
 const queries = require('../utils/queries');
 const errorHandler = require('../utils/errors');
 const redis = require('../utils/redis');
 require('dotenv').config();
+
 /**
  * Gets bearer token from req.headers (authorization section).
  * 
@@ -24,7 +23,6 @@ const formatAndSetToken = async (req, res, next) => {
         next();
     }
     else {
-        // res.sendStatus(403);
         next(errorHandler('Forbidden', 403));
     }
 };
@@ -46,14 +44,6 @@ const signJWTandSendToken = async (req, res, next) => {
             throw errorHandler('Cannot generate token', 500);
         }
 
-        // const user = {
-        //     userID: userID,
-        //     token: token,
-        //     time: new Date(Date.now()),
-        //     isValid: true
-        // };
-        // await queries.insertLoginInfoToDB(user);
-
         res.json({ token: [{ token: token }] });
     }
     catch (error) {
@@ -65,7 +55,7 @@ const signJWTandSendToken = async (req, res, next) => {
  * Verifies token from user using 'jwt.verify' and redis.
  * 
  * If user token is valid and not blacklisted, grants access to requested webpage. 
- * IF token is invalid or blacklisted, the method emits 'Unauthorized' message
+ * If token is invalid or blacklisted, the method emits 'Unauthorized' message
  * alongside a '401' status code.
  */
 const verifyToken = async (req, res, next) => {

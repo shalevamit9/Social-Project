@@ -1,8 +1,10 @@
-/*jshint ignore:start*/
-
 const queries = require('../utils/queries');
 const errorHandler = require('../utils/errors');
 
+
+/**
+ * This method returns application by id in JSON format.
+ */
 const getApplication = async (req, res, next) => {
     try {
         const applicationID = req.params.id;
@@ -25,6 +27,11 @@ const getApplication = async (req, res, next) => {
     }
 }
 
+/**
+ * This method creates a new application.
+ * 
+ * Retrieves the new application's information and stores it in the database.
+ */
 const createNewApplication = async (req, res, next) => {
     
     try {

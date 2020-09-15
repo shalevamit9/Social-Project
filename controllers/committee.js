@@ -1,5 +1,3 @@
-/*jshint ignore:start*/
-
 /**
  * This file contains methods that handle 'committee' related operations.
  */
@@ -10,7 +8,6 @@ const errorHandler = require('../utils/errors');
 /**
  * This method gets all committee participants.
  * 
- * 'getAllInfoFromTable' method is invoked with the table's name, and returns an array with the results.
  * The method responds with the result in JSON format, alongside a '200' status code.
  * If query fails, error is emitted.
  */
@@ -18,7 +15,7 @@ const getAllCommitteeParticipants = async (req, res, next) => {
     try {
         const tableName = 'committee_participants';
         const result = await queries.getAllInfoFromTable(tableName);
-
+        
         res.status(200);
         res.json({ result: result });
     }
@@ -30,9 +27,9 @@ const getAllCommitteeParticipants = async (req, res, next) => {
 /**
  * This methods creates a new committe participant.
  * 
- * The new participant's information is stored in the database by invoking the 'insertNewCommitteeParticipant' method.
+ * The new participant's information is stored in the database.
  * This method responds with the participant's information, his/her new role in the committee,
- * and the committee information, alongside a '201' status code. If the method fails, an error is emitted.
+ * the committee information, and a '201' status code. If the method fails, an error is emitted.
  */
 const createNewParticipant = async (req, res, next) => {
     try {
@@ -66,9 +63,8 @@ const createNewParticipant = async (req, res, next) => {
 /**
  * This method updates a committee participant role.
  * 
- * The participant's ID and committee name alongside his/her new role in the committee is stored
- * by invoking the 'updateCommitteeParticipantRoleDB' method. The method responds with the participant's
- * and the committee's information in JSON format alongside a '201' status code.
+ * Retrieves the participant's ID and committee name alongside his/her new role in the committee.
+ * The method responds with the participant's and the committee's information in JSON format alongside a '201' status code.
  * If the method fails, an error is emitted.
  */
 const updateCommitteeParticipantRole = async (req, res, next) => {
@@ -103,9 +99,8 @@ const updateCommitteeParticipantRole = async (req, res, next) => {
 /**
  * This method deletes a participant from a committee.
  * 
- * The participant's ID and committee name is compared to the information stored in the database by invoking
- * the 'deleteCommitteeParticipantDB' in order to delete the correct participant. The method responds with
- * a boolean in JSON format alongside a '200' status code. If the method fails, an error is emitted.
+ * Compares the participant's ID and committee name to the information stored in the database.
+ * The method responds with a boolean in JSON format alongside a '200' status code. If the method fails, an error is emitted.
  */
 const deleteCommitteeParticipant = async (req, res, next) => {
     try {

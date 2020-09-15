@@ -1,5 +1,3 @@
-/*jshint ignore:start*/
-
 const queries = require('../utils/queries');
 const errorHandler = require('../utils/errors');
 
@@ -20,7 +18,6 @@ const verifyUser = async (req, res, next) => {
 
         /* Query for getting credentials from Database */
         const queryUser = await queries.getUserById(userData.userID);
-
         if (!queryUser) {
             throw errorHandler('Wrong login credentials', 403);
         }
@@ -30,7 +27,6 @@ const verifyUser = async (req, res, next) => {
         }
 
         req.userData = userData;
-
         next();
     }
     catch (error) {

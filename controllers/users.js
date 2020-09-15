@@ -1,14 +1,11 @@
-/*jshint ignore:start*/
-
 /**
- * This file contains middlewares for routes in the website
- * and methods that access the database.
+ * This file contains middlewares for routes in the website.
+ * Also, methods that access the database.
  */
 
 require('dotenv').config();
 
 /* Importing the pool. */
-// const db = require('../utils/database');
 const queries = require('../utils/queries');
 const errorHandler = require('../utils/errors');
 
@@ -65,6 +62,11 @@ const getAllUsers = async (req, res, next) => {
     }
 };
 
+/**
+ * This method updates user's information in DB.
+ * Returns user's inforamtion in JSON format.
+ * If method fails, an error is emitted.
+ */
 const updateUser = async (req, res, next) => {
     try {
         const user = {
@@ -77,7 +79,6 @@ const updateUser = async (req, res, next) => {
             contactUser: req.body.contactUser
         };
 
-        // const userId = req.params.id;
         const isUserExistsInDB = await queries.isUserInDB(user.ID);
         if (!isUserExistsInDB) {
             throw errorHandler('Could not find the user in database', 404);
@@ -88,12 +89,15 @@ const updateUser = async (req, res, next) => {
         res.json([user]);
     }
     catch (error) {
-        // res.sendStatus(401);
-        // console.log(error);
         next(error);
     }
 }
 
+/**
+ * This method deletes a user from DB by id.
+ * Returns true if success, else false.
+ * If method fails, an error is emitted.
+ */
 const deleteUser = async (req, res, next) => {
     try {
         const userId = req.params.id;
@@ -103,8 +107,7 @@ const deleteUser = async (req, res, next) => {
             throw errorHandler('Could not find the user in database', 404);
         }
 
-        const isUserDeleted = await queries.deleteUserFromDB(userId);
-
+        const isUserDeleted = await queries.deleteUserFromDB(userId);        
         if (!isUserDeleted) {
             throw errorHandler('Could not delete user', 500);
         }
@@ -114,8 +117,6 @@ const deleteUser = async (req, res, next) => {
         });
     }
     catch (error) {
-        // res.sendStatus(401);
-        // console.log(error);
         next(error);
     }
 }

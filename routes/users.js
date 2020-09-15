@@ -1,5 +1,3 @@
-/*jshint ignore:start*/
-
 const express = require('express'); 
 
 /* Controller methods */

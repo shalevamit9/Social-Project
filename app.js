@@ -1,5 +1,3 @@
-/*jshint ignore:start*/
-
 /* Requires */
 const express = require('express');
 const bodyParser = require('body-parser')
@@ -25,5 +23,5 @@ app.use((error, req, res, next) => {
     res.status(status).json({ message: message });
 });
 
-// Listening
+/* Listening */
 app.listen(process.env.PORT || 4000);
