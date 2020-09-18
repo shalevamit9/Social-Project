@@ -259,7 +259,7 @@ const addRoom = async(link, userID, participants, time, title)=>{
 }
 
 
-const showFutureRooms = async(token, hostName, title)=>{
+const showFutureRooms = async(token, hostName, title, datetime)=>{
     try{
         let user = await getUserByToken(token)
         my_query = `SELECT DISTINCT title, CONCAT(first_name,' ',last_name) AS host_name, participants, value_date, link FROM xpertesy as x JOIN users as u ON
@@ -281,7 +281,7 @@ const showFutureRooms = async(token, hostName, title)=>{
     }
 }
 
-const showPastRooms = async(token, hostName, title)=>{
+const showPastRooms = async(token, hostName, title, datetime)=>{
     try{
         
         let user = await getUserByToken(token)

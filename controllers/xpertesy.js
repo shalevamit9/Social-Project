@@ -53,11 +53,11 @@ const showRooms = async(req, res, next) => {
         let hostName = await req.body.hasOwnProperty('hostName') ? req.body.hostName : false;
         let meetingTitle = await req.body.hasOwnProperty('meetingTitle') ? req.body.meetingTitle : false;
         if (req.body.fromDate >= datetime && !isToDate){
-            let tables = await qr.showFutureRooms(req.headers.token, hostName, meetingTitle);
+            let tables = await qr.showFutureRooms(req.headers.token, hostName, meetingTitle, datetime);
             res.json({Data: tables});
         }
         else if(req.body.toDate <= datetime && !isFromDate){
-            let tables = await qr.showPastRooms(req.headers.token, hostName, meetingTitle);
+            let tables = await qr.showPastRooms(req.headers.token, hostName, meetingTitle, datetime);
             res.json({Data: tables});
         }
         else if (isToDate && isFromDate) {
