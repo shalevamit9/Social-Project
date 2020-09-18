@@ -6,6 +6,7 @@ const bodyParser = require('body-parser')
 const usersRoutes = require('./routes/users');
 const committeeRoutes = require('./routes/committee');
 const inboxRoutes = require('./routes/inbox');
+const xpertesyRoutes = require('./routes/xpertesy');
 
 /* Initialize server */
 const app = express();
@@ -18,6 +19,7 @@ app.use(bodyParser.json());
 app.use(usersRoutes);
 app.use(committeeRoutes);
 app.use(inboxRoutes);
+app.use(xpertesyRoutes);
 
 app.use((error, req, res, next) => {
     console.log(error);
