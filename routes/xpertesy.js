@@ -9,9 +9,9 @@ const xpertesyController = require('../controllers/xpertesy');
 /* For handling routes */
 const router = express.Router();
 
-/* Creates new room */
+/* Creates new xpert esy room */
 router.post('/xpertesy/createroom', xpertesyController.createRoom);
-// show rooms 
+// show xpertesy rooms 
 router.post('/xpertesy/showrooms', xpertesyController.showRooms)
 
 module.exports = router;

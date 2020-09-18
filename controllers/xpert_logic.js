@@ -1,5 +1,4 @@
 var validator = require("email-validator");
-const express = require("express");
 let datetime = new Date();
     datetime = datetime.toISOString().slice(0,10)
 

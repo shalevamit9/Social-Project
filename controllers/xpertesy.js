@@ -1,6 +1,4 @@
-const db = require('../db');
 const qr = require('../utils/queries');
-const express = require("express");
 const xpertVald = require('./xpert_logic')
 //unique session ID module
 var uuid = require('uuid');
