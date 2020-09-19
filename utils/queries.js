@@ -264,7 +264,7 @@ const showFutureRooms = async(token, hostName, title, datetime)=>{
         let user = await getUserByToken(token)
         my_query = `SELECT DISTINCT title, CONCAT(first_name,' ',last_name) AS host_name, participants, value_date, link FROM xpertesy as x JOIN users as u ON
                 (u.user_id = x.host_id), unnest(participants) as participant  
-                WHERE (host_id = ${user.user_id} OR  lower(participant)  LIKE '%${user.email}%')
+                WHERE (host_id = ${user.user_id} OR  participant  LIKE '%${user.email}%')
                 AND value_date >=  '${datetime}'`;
         my_query += hostName ? ` AND CONCAT(first_name,' ',last_name) = '${hostName}'` : ''
         my_query += title ? ` AND title = '${title}'` : ''
@@ -287,7 +287,7 @@ const showPastRooms = async(token, hostName, title, datetime)=>{
         let user = await getUserByToken(token)
         my_query = `SELECT DISTINCT title, CONCAT(first_name,' ',last_name) AS host_name, participants, value_date, link FROM xpertesy as x JOIN users as u ON
                 (u.user_id = x.host_id), unnest(participants) as participant  
-                WHERE (host_id = ${user.user_id} OR  lower(participant)  LIKE '%${user.email}%')
+                WHERE (host_id = ${user.user_id} OR  participant  LIKE '%${user.email}%')
                 AND value_date <=  '${datetime}'`
         my_query += hostName ? ` AND CONCAT(first_name,' ',last_name) = '${hostName}'` : ''
         my_query += title ? ` AND title = '${title}'` : ''
@@ -311,7 +311,7 @@ const showBetweenRooms = async(token, hostName, title, fromDate, toDate)=>{
         let user = await getUserByToken(token)
         my_query = `SELECT DISTINCT title, CONCAT(first_name,' ',last_name) AS host_name, participants, value_date, link FROM xpertesy as x JOIN users as u ON
                 (u.user_id = x.host_id), unnest(participants) as participant  
-                WHERE (host_id = ${user.user_id} OR  lower(participant)  LIKE '%${user.email}%')
+                WHERE (host_id = ${user.user_id} OR  participant  LIKE '%${user.email}%')
                 AND  value_date BETWEEN '${fromDate}' AND '${toDate}'`
         my_query += hostName ? ` AND CONCAT(first_name,' ',last_name) = '${hostName}'` : ''
         my_query += title ? ` AND title = '${title}'` : ''
