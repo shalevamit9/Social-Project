@@ -48,7 +48,7 @@ const showRooms = async(req, res, next) => {
         let isFromDate = req.body.hasOwnProperty('fromDate');
         let isToDate = req.body.hasOwnProperty('toDate');
         if (!isFromDate && !isToDate){
-            throw new ERROR('must provide atleast one kind of room paramaters', 405);
+            throw new Error('must provide atleast one kind of room paramaters', 405);
         }
         let hostName = await req.body.hasOwnProperty('hostName') ? req.body.hostName : false;
         let meetingTitle = await req.body.hasOwnProperty('meetingTitle') ? req.body.meetingTitle : false;
@@ -65,7 +65,7 @@ const showRooms = async(req, res, next) => {
             res.json({Data: tables});           
         }
         else{
-            throw new ERROR('invalid dates', 405)
+            throw new Error('invalid dates', 405)
         }
     }
     catch(err){
