@@ -12,7 +12,8 @@ const createRoom = async (req, res, next) => {
         const validate_data = await xpertVald.checkCreateRoomParam(req.body);
         //validate email adress return false if invalid
         // retrieve user by token
-        let user = await qr.getUserByToken(req.headers.token)
+        let user = await qr.getUserById(req.userID)
+        console.log(user)
         const participants = await xpertVald.validateEmail(req.body.participants, user.email);
         if (participants == false){
             throw new Error('invalid email adress', 403);
@@ -53,15 +54,15 @@ const showRooms = async(req, res, next) => {
         let hostName = await req.body.hasOwnProperty('hostName') ? req.body.hostName : false;
         let meetingTitle = await req.body.hasOwnProperty('meetingTitle') ? req.body.meetingTitle : false;
         if (req.body.fromDate >= datetime && !isToDate){
-            let tables = await qr.showFutureRooms(req.headers.token, hostName, meetingTitle, datetime);
+            let tables = await qr.showFutureRooms(req.userID, hostName, meetingTitle, datetime);
             res.json({Data: tables});
         }
         else if(req.body.toDate <= datetime && !isFromDate){
-            let tables = await qr.showPastRooms(req.headers.token, hostName, meetingTitle, datetime);
+            let tables = await qr.showPastRooms(req.userID, hostName, meetingTitle, datetime);
             res.json({Data: tables});
         }
         else if (isToDate && isFromDate) {
-            let tables = await qr.showBetweenRooms(req.headers.token, hostName, meetingTitle,req.body.fromDate, req.body.toDate);
+            let tables = await qr.showBetweenRooms(req.userID, hostName, meetingTitle,req.body.fromDate, req.body.toDate);
             res.json({Data: tables});           
         }
         else{

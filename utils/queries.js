@@ -24,9 +24,9 @@ const insertUserToDB = async (user) => {
         const results = await db.query(
             `INSERT INTO 
             users 
-            (user_id, first_name, last_name, password, birth_date, type, position, picture, phone, last_login, mail, contacts) 
+            (user_id, first_name, last_name, password, birth_date, type, picture, phone, email, contacts) 
             VALUES 
-            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 ,$11, $12)`,
+            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
             [
                 user.ID,
                 user.firstName,
@@ -34,8 +34,6 @@ const insertUserToDB = async (user) => {
                 user.password,
                 null,
                 user.type,
-                null,
-                null,
                 null,
                 null,
                 user.email,
@@ -259,9 +257,9 @@ const addRoom = async(link, userID, participants, time, title)=>{
 }
 
 
-const showFutureRooms = async(token, hostName, title, datetime)=>{
+const showFutureRooms = async(userID, hostName, title, datetime)=>{
     try{
-        let user = await getUserByToken(token)
+        let user = await getUserById(userID)
         my_query = `SELECT DISTINCT title, CONCAT(first_name,' ',last_name) AS host_name, participants, value_date, link FROM xpertesy as x JOIN users as u ON
                 (u.user_id = x.host_id), unnest(participants) as participant  
                 WHERE (host_id = ${user.user_id} OR  participant  LIKE '%${user.email}%')
@@ -281,10 +279,10 @@ const showFutureRooms = async(token, hostName, title, datetime)=>{
     }
 }
 
-const showPastRooms = async(token, hostName, title, datetime)=>{
+const showPastRooms = async(userID, hostName, title, datetime)=>{
     try{
         
-        let user = await getUserByToken(token)
+        let user = await getUserById(userID)
         my_query = `SELECT DISTINCT title, CONCAT(first_name,' ',last_name) AS host_name, participants, value_date, link FROM xpertesy as x JOIN users as u ON
                 (u.user_id = x.host_id), unnest(participants) as participant  
                 WHERE (host_id = ${user.user_id} OR  participant  LIKE '%${user.email}%')
@@ -305,10 +303,10 @@ const showPastRooms = async(token, hostName, title, datetime)=>{
 }
 
 
-const showBetweenRooms = async(token, hostName, title, fromDate, toDate)=>{
+const showBetweenRooms = async(userID, hostName, title, fromDate, toDate)=>{
     try{
         
-        let user = await getUserByToken(token)
+        let user = await getUserById(userID)
         my_query = `SELECT DISTINCT title, CONCAT(first_name,' ',last_name) AS host_name, participants, value_date, link FROM xpertesy as x JOIN users as u ON
                 (u.user_id = x.host_id), unnest(participants) as participant  
                 WHERE (host_id = ${user.user_id} OR  participant  LIKE '%${user.email}%')
