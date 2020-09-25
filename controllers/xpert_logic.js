@@ -8,10 +8,7 @@ const validateEmail = async(participants, hostEmail)=> {
         try{
             let emailArray = await participants.replace('{', '').replace('}','').replace(' ', '').split(',');
             let emailSet = new Set(emailArray)
-            console.log()
             if (emailSet.size !== emailArray.length){
-                console.log(emailArray.length)
-                console.log(emailSet.length)
                 throw new Error('Duplicate emails', 405);
             }
             let emails = []

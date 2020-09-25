@@ -13,7 +13,6 @@ const createRoom = async (req, res, next) => {
         //validate email adress return false if invalid
         // retrieve user by token
         let user = await qr.getUserById(req.userID)
-        console.log(user)
         const participants = await xpertVald.validateEmail(req.body.participants, user.email);
         if (participants == false){
             throw new Error('invalid email adress', 403);
