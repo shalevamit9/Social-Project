@@ -24,20 +24,18 @@ const insertUserToDB = async (user) => {
         const results = await db.query(
             `INSERT INTO 
             users 
-            (user_id, first_name, last_name, password, birth_date, type, position, picture, phone, last_login, mail, contacts) 
+            (user_id, first_name, last_name, password, birth_date, type, picture, phone, email, contacts) 
             VALUES 
-            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 ,$11, $12)`,
+            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
             [
                 user.ID,
                 user.firstName,
                 user.lastName,
                 user.password,
-                null,
+                user.birthDay,
                 user.type,
                 null,
-                null,
-                null,
-                null,
+                user.phone,
                 user.email,
                 user.contactUser
             ]
@@ -85,13 +83,15 @@ const isUserInDB = async (userId) => {
 const updateUserInDB = async (user) => {
     try {
         const result = await db.query(
-            'UPDATE users SET first_name = $1, last_name = $2, mail = $3, type = $4, contacts = $5 WHERE user_id = $6',
-            [
+            'UPDATE users SET first_name = $1, last_name = $2, email = $3, type = $4, contacts = $5, birth_date = $6, phone = $7 WHERE user_id = $8',
+            [                
                 user.firstName,
                 user.lastName,
                 user.email,
-                user.userType,
+                user.type,
                 user.contactUser,
+                user.birthDay,
+                user.phone,
                 user.ID
             ]
         );

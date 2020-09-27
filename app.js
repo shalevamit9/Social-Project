@@ -6,6 +6,7 @@ const bodyParser = require('body-parser')
 const usersRoutes = require('./routes/users');
 const committeeRoutes = require('./routes/committee');
 const inboxRoutes = require('./routes/inbox');
+const newsRoutes = require('./routes/news');
 
 /* Initialize server */
 const app = express();
@@ -18,6 +19,7 @@ app.use(bodyParser.json());
 app.use(usersRoutes);
 app.use(committeeRoutes);
 app.use(inboxRoutes);
+app.use(newsRoutes);
 
 app.use((error, req, res, next) => {
     console.log(error);
@@ -28,4 +30,4 @@ app.use((error, req, res, next) => {
 });
 
 /* Listening */
-app.listen(process.env.PORT || 4000);
+app.listen(process.env.PORT || 8080);
