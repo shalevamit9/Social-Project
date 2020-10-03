@@ -286,7 +286,7 @@ const showPastRooms = async(userID, hostName, title, datetime)=>{
         my_query = `SELECT DISTINCT title, CONCAT(first_name,' ',last_name) AS host_name, participants, value_date, link FROM xpertesy as x JOIN users as u ON
                 (u.user_id = x.host_id), unnest(participants) as participant  
                 WHERE (host_id = ${user.user_id} OR  participant  LIKE '%${user.email}%')
-                AND value_date <=  '${datetime}'`
+                AND value_date <=  '${datetime}' DESC`
         my_query += hostName ? ` AND CONCAT(first_name,' ',last_name) = '${hostName}'` : ''
         my_query += title ? ` AND title = '${title}'` : ''
         my_query += ` ORDER BY value_date`
