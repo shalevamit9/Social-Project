@@ -32,7 +32,7 @@ const createRoom = async (req, res, next) => {
 
         }
 
-        await qr.addRoom(meeting_link, user.user_id, req.body.participants, validate_data.date, validate_data.roomName)
+        await qr.addRoom(meeting_link, user.user_id, participants, validate_data.date, validate_data.roomName)
         res.json({
             link: meeting_link + validate_data.hostName.replace(/ /g,'%20')
         });  

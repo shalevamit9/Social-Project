@@ -247,6 +247,7 @@ const deleteCommitteeParticipantDB = async (participant) => {
 }
 const addRoom = async(link, userID, participants, time, title)=>{
     try{
+        console.log(participants)
         let res = await db.query(`INSERT INTO "xpertesy" (link, host_id, participants, value_date, title)
         VALUES ($1,$2,$3::text[],$4,$5)`, [link, userID, participants, time, title]);
         return res;
@@ -289,7 +290,7 @@ const showPastRooms = async(userID, hostName, title, datetime)=>{
                 AND value_date <=  '${datetime}'`
         my_query += hostName ? ` AND CONCAT(first_name,' ',last_name) = '${hostName}'` : ''
         my_query += title ? ` AND title = '${title}'` : ''
-        my_query += ` ORDER BY value_date`
+        my_query += ` ORDER BY value_date DESC`
         
         let res = await db.query(my_query);                                                                             
           for (i = 0; i < res.rows.length; i++) { 

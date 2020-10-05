@@ -4,15 +4,25 @@ let datetime = new Date();
 
 
 // use of email_validator module to check if the mails are corrects
-const validateEmail = async(participants, hostEmail)=> {
+const validateEmail = async(emailArray, hostEmail)=> {
         try{
-            let emailArray = await participants.replace('{', '').replace('}','').replace(' ', '').split(',');
             let emailSet = new Set(emailArray)
             if (emailSet.size !== emailArray.length){
                 throw new Error('Duplicate emails', 405);
             }
-            let emails = []
-            for (let email of participants.replace('{', '').replace('}','').replace(' ', '').split(',')) { 
+            let emails = "{" 
+            let first = emailArray.shift();
+            if (validator.validate(first.trim()) == false) {
+                throw new Error('invalid email', 405);
+            }
+            else if(hostEmail == first) {
+                throw new Error('host cant add himself as participant', 405);
+            }
+            else{
+                emails += first
+            }
+            
+            for (email of emailArray){
                 if (validator.validate(email.trim()) == false) {
                     throw new Error('invalid email', 405);
                 }
@@ -20,10 +30,10 @@ const validateEmail = async(participants, hostEmail)=> {
                     throw new Error('host cant add himself as participant', 405);
                 }
                 else{
-                    emails.push(email);
+                    emails += `, ${email}`
                 }
             }
-            return emails;
+            return (emails + '}')
         }
         catch(err){
             throw err;
@@ -41,14 +51,12 @@ const checkCreateRoomParam = async(data)=> {
         let hostName = data.hasOwnProperty('hostName') ? data.hostName: 'MyName';
         let date = data.hasOwnProperty('date') ? data.date: datetime;
         let emails = []
-        for (let email of data.participants.split(',')) { 
-                emails.push(email)
-            }
+
         const validData = {
             roomName: roomName,
             hostName: hostName,
             date: date,
-            emailLength: emails.length
+            emailLength: data.participants.length
         };
         return validData;
     }
