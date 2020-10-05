@@ -21,9 +21,10 @@ const createNewUser = async (req, res, next) => {
             lastName: req.body.lastName,
             email: req.body.email,
             password: req.body.password,
-            type: req.body.userType,
+            type: req.body.type,
             contactUser: req.body.contactUser,
-            lastLogin: null
+            birthDay: req.body.birthday,
+            phone: req.body.phone
         };
 
         const existingUser = await queries.getUserById(newUser.ID);
@@ -73,8 +74,10 @@ const updateUser = async (req, res, next) => {
             lastName: req.body.lastName,
             email: req.body.email,
             password: req.body.password,
-            userType: req.body.userType,
-            contactUser: req.body.contactUser
+            type: req.body.type,
+            contactUser: req.body.contactUser,
+            birthDay: req.body.birthday,
+            phone: req.body.phone
         };
 
         const isUserExistsInDB = await queries.isUserInDB(user.ID);

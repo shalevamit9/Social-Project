@@ -37,10 +37,8 @@ const signJWTandSendToken = async (req, res, next) => {
     const userID = req.userData.userID;
 
     try {
-        console.log('before sign');
         const token = jwt.sign({ userID: userID }, process.env.ACCESS_TOKEN_SECRET);
-        console.log('after sign');
-
+        
         if (!token) {
             throw errorHandler('Cannot generate token', 500);
         }
@@ -67,7 +65,7 @@ const verifyToken = async (req, res, next) => {
             if (error) {
                 next(error);
             }
-            console.log(data);
+            
             if (!decodedToken || data) {
                 next(errorHandler('Unauthorized', 401));
             }

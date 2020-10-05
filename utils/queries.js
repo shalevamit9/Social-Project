@@ -32,10 +32,10 @@ const insertUserToDB = async (user) => {
                 user.firstName,
                 user.lastName,
                 user.password,
-                null,
+                user.birthDay,
                 user.type,
                 null,
-                null,
+                user.phone,
                 user.email,
                 user.contactUser
             ]
@@ -83,13 +83,15 @@ const isUserInDB = async (userId) => {
 const updateUserInDB = async (user) => {
     try {
         const result = await db.query(
-            'UPDATE users SET first_name = $1, last_name = $2, mail = $3, type = $4, contacts = $5 WHERE user_id = $6',
-            [
+            'UPDATE users SET first_name = $1, last_name = $2, email = $3, type = $4, contacts = $5, birth_date = $6, phone = $7 WHERE user_id = $8',
+            [                
                 user.firstName,
                 user.lastName,
                 user.email,
-                user.userType,
+                user.type,
                 user.contactUser,
+                user.birthDay,
+                user.phone,
                 user.ID
             ]
         );
@@ -287,7 +289,7 @@ const showPastRooms = async(userID, hostName, title, datetime)=>{
         my_query = `SELECT DISTINCT title, CONCAT(first_name,' ',last_name) AS host_name, participants, value_date, link FROM xpertesy as x JOIN users as u ON
                 (u.user_id = x.host_id), unnest(participants) as participant  
                 WHERE (host_id = ${user.user_id} OR  participant  LIKE '%${user.email}%')
-                AND value_date <=  '${datetime}'`
+                AND value_date <=  '${datetime}' DESC`
         my_query += hostName ? ` AND CONCAT(first_name,' ',last_name) = '${hostName}'` : ''
         my_query += title ? ` AND title = '${title}'` : ''
         my_query += ` ORDER BY value_date DESC`
