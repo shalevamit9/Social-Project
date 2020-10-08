@@ -20,7 +20,9 @@ router.post('/users', usersController.createNewUser);
  * User credentials are verified. If credentials are valid,
  * a token is signed and sent. Else, sends a 403.
  */
-router.post('/login', validation.verifyUser, authorization.signJWTandSendToken);
+router.post('/loginManager/login', validation.verifyUser, authorization.signJWTandSendToken);
+
+router.get('/loginManager/passwordExceeded', validation.verifyUser, usersController.getDaysSinceLastPasswordChange);
 
 /**
  * Log out procedure. User's token is invalidated.

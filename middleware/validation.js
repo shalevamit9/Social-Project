@@ -18,6 +18,7 @@ const verifyUser = async (req, res, next) => {
 
         /* Query for getting credentials from Database */
         const queryUser = await queries.getUserById(userData.userID);
+        
         if (!queryUser) {
             throw errorHandler('Wrong login credentials', 403);
         }

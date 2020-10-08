@@ -35,9 +35,10 @@ const createNewUser = async (req, res, next) => {
             /* not sure what to return */
             throw errorHandler('User already exists', 409);
         }
-            
+        
         /* User does not exists. Creating new user */
         await queries.insertUserToDB(newUser);
+        await queries.insertUserCredentialsToDB(newUser);
 
         res.json([newUser]);
     }
@@ -108,7 +109,7 @@ const deleteUser = async (req, res, next) => {
             throw errorHandler('Could not find the user in database', 404);
         }
 
-        const isUserDeleted = await queries.deleteUserFromDB(userId);        
+        const isUserDeleted = await queries.deleteUserFromDB(userId);     
         if (!isUserDeleted) {
             throw errorHandler('Could not delete user', 500);
         }
@@ -122,9 +123,21 @@ const deleteUser = async (req, res, next) => {
     }
 }
 
+const getDaysSinceLastPasswordChange = async (req, res, next) => {
+    try {
+        const days = await queries.getDaysSinceLastPasswordChangeInDB(req.body.userID);
+
+        res.json([days]);
+    }
+    catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     createNewUser: createNewUser,
     updateUser: updateUser,
     deleteUser: deleteUser,
-    getAllUsers: getAllUsers
+    getAllUsers: getAllUsers,
+    getDaysSinceLastPasswordChange: getDaysSinceLastPasswordChange
 };

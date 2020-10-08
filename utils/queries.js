@@ -7,7 +7,7 @@ const db = require('./database');
  */
 const getAllUsersFromDB = async () => {
     try {
-        const users = await db.query('SELECT * FROM users');
+        const users = await db.query('SELECT * FROM user_details');
 
         return users.rows;
     }
@@ -16,6 +16,15 @@ const getAllUsersFromDB = async () => {
     }
 };
 
+const insertUserCredentialsToDB = async (user) => {
+    try {
+        const result = await db.query(`INSERT INTO user_credentials VALUES($1, $2, $3)`, [user.ID, user.password, new Date(Date.now())]);
+    }
+    catch (error) {
+        next(error);
+    }
+}
+
 /**
  * Inserts a user to the database
  */
@@ -23,15 +32,14 @@ const insertUserToDB = async (user) => {
     try {
         const results = await db.query(
             `INSERT INTO 
-            users 
-            (user_id, first_name, last_name, password, birth_date, type, picture, phone, email, contacts) 
+            user_details 
+            (user_id, first_name, last_name, birth_date, type, picture, phone, email, contacts) 
             VALUES 
-            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+            ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
             [
                 user.ID,
                 user.firstName,
                 user.lastName,
-                user.password,
                 user.birthDay,
                 user.type,
                 null,
@@ -53,9 +61,13 @@ const insertUserToDB = async (user) => {
  */
 const getUserById = async (userID) => {
     try {
-
-        const result = await db.query(`SELECT * FROM users WHERE user_id=$1`, [userID]);
-
+        const result = await db.query(`
+        SELECT * FROM user_details
+        INNER JOIN
+        user_credentials
+        USING(user_id)
+        WHERE user_id=$1`, [userID]);
+        
         return result.rows[0];
     }
     catch (error) {
@@ -63,12 +75,28 @@ const getUserById = async (userID) => {
     }
 };
 
+const getDaysSinceLastPasswordChangeInDB = async (userID) => {
+    try {
+        const days = await db.query(`
+        SELECT DATE_PART('day', current_date - last_password_change) as "daysSinceLastPasswordChange"
+        FROM user_credentials
+        WHERE user_id=$1`
+            , [userID]
+        );
+
+        return days.rows[0];
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
 /**
  * Returns true if the user with the userId exists in the database, return false otherwise
  */
 const isUserInDB = async (userId) => {
     try {
-        const existingUser = await db.query(`SELECT * FROM users WHERE user_id=$1`, [userId]);
+        const existingUser = await db.query(`SELECT * FROM user_details WHERE user_id=$1`, [userId]);
     
         return existingUser.rowCount !== 0;
     }
@@ -83,7 +111,7 @@ const isUserInDB = async (userId) => {
 const updateUserInDB = async (user) => {
     try {
         const result = await db.query(
-            'UPDATE users SET first_name = $1, last_name = $2, email = $3, type = $4, contacts = $5, birth_date = $6, phone = $7 WHERE user_id = $8',
+            'UPDATE user_details SET first_name = $1, last_name = $2, email = $3, type = $4, contacts = $5, birth_date = $6, phone = $7 WHERE user_id = $8',
             [                
                 user.firstName,
                 user.lastName,
@@ -109,8 +137,9 @@ const updateUserInDB = async (user) => {
  * false otherwise
  */
 const deleteUserFromDB = async (userId) => {
-    try{
-        const result = await db.query(`DELETE FROM users WHERE user_id = $1`, [userId]);
+    try {
+        // need to add 'ON DELETE CASCADE' to the user_credentials table, and make the user_id to foreign key'
+        const result = await db.query(`DELETE FROM user_details WHERE user_id = $1`, [userId]);
 
         return result.rowCount !== 0;
     }
@@ -118,28 +147,6 @@ const deleteUserFromDB = async (userId) => {
         throw error;
     }
 }
-
-/**
- * Inserts a login information about a user to the database
- */
-const insertLoginInfoToDB = async (user) => {
-    try {
-        const result = await db.query(
-            'INSERT INTO "login" (user_id, token, time, is_valid) VALUES($1, $2, $3, $4)',
-            [
-                user.userID,
-                user.token,
-                user.time,
-                user.isValid
-            ]
-        );
-        
-        return result.rowCount;
-    }
-    catch (error) {
-        throw error;
-    }
-};
 
 const updateColumn = async (table, column, data, userID) => {
     try {
@@ -194,16 +201,24 @@ const insertNewApplication = async (application) => {
     }
 }
 
-const getTokenValidation = async (token) => {
-    try {
-        const result = await db.query(`SELECT is_valid FROM where token=${token}`);
 
-        return result.rows[0];
+/* Untested function - need to test! */
+const getAllCommitteeParticipantsDB = async (committeeName) => {
+    try {
+        const result = await db.query(`
+        SELECT ud.user_id, first_name, last_name, ud.type, picture, birth_date, phone, email, contacts,		
+		c.committee_name, committee_information, contact_information,
+		cp.committee_position
+        FROM user_details ud LEFT JOIN committee_participants cp USING(user_id) RIGHT JOIN committee c USING(committee_name)
+        WHERE committee_name = $1
+        `, [committeeName]);
+
+        return result.rows;
     }
     catch (error) {
-        throw error;
+        throw error
     }
-};
+}
 
 const insertNewCommitteeParticipant = async (participant) => {
     try {
@@ -250,17 +265,18 @@ const deleteCommitteeParticipantDB = async (participant) => {
 
 module.exports = {
     getAllUsersFromDB: getAllUsersFromDB,
+    insertUserCredentialsToDB: insertUserCredentialsToDB,
     insertUserToDB: insertUserToDB,
     getUserById: getUserById,
+    getDaysSinceLastPasswordChangeInDB: getDaysSinceLastPasswordChangeInDB,
     isUserInDB: isUserInDB,
     updateUserInDB: updateUserInDB,
     deleteUserFromDB: deleteUserFromDB,
-    insertLoginInfoToDB: insertLoginInfoToDB,
     updateColumn: updateColumn,
     getAllInfoFromTable: getAllInfoFromTable,
     getApplicationByID: getApplicationByID,
     insertNewApplication: insertNewApplication,
-    getTokenValidation: getTokenValidation,
+    getAllCommitteeParticipantsDB: getAllCommitteeParticipantsDB,
     insertNewCommitteeParticipant: insertNewCommitteeParticipant,
     updateCommitteeParticipantRoleDB: updateCommitteeParticipantRoleDB,
     deleteCommitteeParticipantDB: deleteCommitteeParticipantDB

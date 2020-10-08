@@ -4,6 +4,7 @@
 
 const queries = require('../utils/queries');
 const errorHandler = require('../utils/errors');
+const e = require('express');
 
 /**
  * This method gets all committee participants.
@@ -13,11 +14,38 @@ const errorHandler = require('../utils/errors');
  */
 const getAllCommitteeParticipants = async (req, res, next) => {
     try {
-        const tableName = 'committee_participants';
-        const result = await queries.getAllInfoFromTable(tableName);
+        const committeeName = req.params.committeeName;
+        const committeePosition = req.body.committeePosition;
         
-        res.status(200);
-        res.json({ result: result });
+        let committeeParticipantsArray = await queries.getAllCommitteeParticipantsDB(committeeName);
+
+        if (committeePosition && committeePosition[0]) {
+            committeeParticipantsArray = committeeParticipantsArray.filter(participant => committeePosition.includes(participant.committee_position));
+        }
+        
+        const data = committeeParticipantsArray.map(participant => {
+            return {
+                user: {
+                    userID: participant.user_id,
+                    firstName: participant.first_name,
+                    lastName: participant.last_name,
+                    type: participant.type,
+                    picture: participant.picture,
+                    birthday: participant.birth_date,
+                    phone: participant.phone,
+                    email: participant.email,
+                    contacts: participant.contacts
+                },
+                committee: {
+                    committeeName: participant.committee_name,
+                    committeeInformation: participant.committee_information,
+                    contactsInfo: participant.contacts_info
+                },
+                committeePosition: participant.committee_position
+            };
+        });
+
+        res.status(200).json(data);
     }
     catch (error) {
         next(error);
