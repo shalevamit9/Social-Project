@@ -1,5 +1,10 @@
 # REST API Project
-Developed and tested by: Amit Shalev, Marko Katziv, Avishay Robinov
+
+**Prerequisites**
+- Node.js
+- PostgreSQL
+- Redis
+- Postman
 
 ## Controller folder
 
@@ -15,11 +20,15 @@ This folder contains the following files:
 - `getApplication`
 - `createNewApplication`
 
+**bews.js** - controlls news related operations.
+- `scrapeNews`
+
 **users.js** - controlls user related operations.
 - `createNewUser`
 - `getAllUsers`
 - `updateUser`
 - `deleteUser`
+- `getDaysSinceLastPasswordChange`
 
 ## Middleware folder
 
@@ -39,22 +48,27 @@ This folder contains:
 This folder contains: 
 
 **committee.js** - contains committee related routes. 
-- `/committeeParticipants` - GET
+- `/committeeParticipants:committeeName` - GET
 - `/committees` - POST
 - `/committees/:committeeName` - PATCH
 - `/committees/:committeeName` - DELETE
 
 **inbox.js** - contains inbox and messaging related routes.
-- `/inbox` - POST
 - `/inbox/:id` - GET
+- `/inbox` - POST
+
+**news.js** - contains news related routes.
+- `/news` - GET
 
 **users.js** - contains user related routes.
 - `/users` - GET
 - `/users` - POST
-- `/login` - POST
+- `/loginManager/login` - POST
+- `/loginManager/passwordExceeded` - POST
 - `/logout` - POST
 - `/users/:id` - PATCH
 - `/users/:id` - DELETE
+
 
 ## Utilities Folder
 
