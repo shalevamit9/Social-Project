@@ -13,6 +13,8 @@ const router = express.Router();
  */
 router.get('/users', authorization.formatAndSetToken, authorization.verifyToken, usersController.getAllUsers);
 
+router.get('/user', authorization.formatAndSetToken, authorization.verifyToken, usersController.getUser)
+
 /* Creates new user */
 router.post('/users', usersController.createNewUser);
 

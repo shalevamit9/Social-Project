@@ -63,6 +63,30 @@ const getAllUsers = async (req, res, next) => {
 };
 
 /**
+ * Return a specific user by an ID
+ */
+const getUser = async (req, res, next) => {
+    try {
+        const fetchedUser = await queries.getUserById(req.userID);
+
+        const user = {
+            id: fetchedUser.user_id,
+            firstName: fetchedUser.first_name,
+            lastName: fetchedUser.last_name,
+            email: fetchedUser.email,
+            userType: fetchedUser.type,
+            contactUser: fetchedUser.contacts,
+            birthday: fetchedUser.birth_date
+        };
+
+        res.status(200).json(user);
+    }
+    catch (error) {
+        next(error);
+    }
+}
+
+/**
  * This method updates user's information in DB.
  * Returns user's inforamtion in JSON format.
  * If method fails, an error is emitted.
@@ -139,5 +163,6 @@ module.exports = {
     updateUser: updateUser,
     deleteUser: deleteUser,
     getAllUsers: getAllUsers,
+    getUser: getUser,
     getDaysSinceLastPasswordChange: getDaysSinceLastPasswordChange
 };
