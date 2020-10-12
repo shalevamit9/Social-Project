@@ -63,7 +63,7 @@ const getAllUsers = async (req, res, next) => {
 };
 
 /**
- * 
+ * Return a specific user by an ID
  */
 const getUser = async (req, res, next) => {
     try {
