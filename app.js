@@ -2,7 +2,8 @@ require('dotenv').config();
 
 /* Requires */
 const express = require('express');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const cors = require('cors');
 const usersRoutes = require('./routes/users');
 const committeeRoutes = require('./routes/committee');
 const inboxRoutes = require('./routes/inbox');
@@ -10,6 +11,9 @@ const newsRoutes = require('./routes/news');
 
 /* Initialize server */
 const app = express();
+
+/* Initialize cors */
+app.use(cors());
 
 /* Parsing middlewares */
 app.use(bodyParser.urlencoded({ extended: true }));
