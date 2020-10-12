@@ -67,8 +67,7 @@ const getAllUsers = async (req, res, next) => {
  */
 const getUser = async (req, res, next) => {
     try {
-        const userID = req.params.id;
-        const fetchedUser = await queries.getUserById(userID);
+        const fetchedUser = await queries.getUserById(req.userID);
 
         const user = {
             id: fetchedUser.user_id,
