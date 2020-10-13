@@ -266,13 +266,13 @@ const showFutureRooms = async(userID, hostName, title, datetime)=>{
                 (u.user_id = x.host_id), unnest(participants) as participant  
                 WHERE (host_id = ${user.user_id} OR  participant  LIKE '%${user.email}%')
                 AND value_date >=  '${datetime}'`;
-        my_query += hostName ? ` AND CONCAT(first_name,' ',last_name) = '${hostName}'` : ''
+        my_query += hostName ? ` AND CONCAT(first_name,' ',last_name) = '${hostName}'` : '';
         my_query += title ? ` AND title = '${title}'` : ''
-        my_query += ` ORDER BY value_date`
+        my_query += ` ORDER BY value_date`;
         
         let res = await db.query(my_query);                                                                             
           for (i = 0; i < res.rows.length; i++) { 
-            res.rows[i].link = res.rows[i].link + user.first_name
+            res.rows[i].link = res.rows[i].link + user.first_name;
             }
         return res.rows;
     } 
@@ -288,10 +288,10 @@ const showPastRooms = async(userID, hostName, title, datetime)=>{
         my_query = `SELECT DISTINCT title, CONCAT(first_name,' ',last_name) AS host_name, participants, value_date, link FROM xpertesy as x JOIN users as u ON
                 (u.user_id = x.host_id), unnest(participants) as participant  
                 WHERE (host_id = ${user.user_id} OR  participant  LIKE '%${user.email}%')
-                AND value_date <=  '${datetime}' `
-        my_query += hostName ? ` AND CONCAT(first_name,' ',last_name) = '${hostName}'` : ''
-        my_query += title ? ` AND title = '${title}'` : ''
-        my_query += ` ORDER BY value_date DESC`
+                AND value_date <=  '${datetime}' `;
+        my_query += hostName ? ` AND CONCAT(first_name,' ',last_name) = '${hostName}'` : '';
+        my_query += title ? ` AND title = '${title}'` : '';
+        my_query += ` ORDER BY value_date DESC`;
         
         let res = await db.query(my_query);                                                                             
           for (i = 0; i < res.rows.length; i++) { 
@@ -312,14 +312,14 @@ const showBetweenRooms = async(userID, hostName, title, fromDate, toDate)=>{
         my_query = `SELECT DISTINCT title, CONCAT(first_name,' ',last_name) AS host_name, participants, value_date, link FROM xpertesy as x JOIN users as u ON
                 (u.user_id = x.host_id), unnest(participants) as participant  
                 WHERE (host_id = ${user.user_id} OR  participant  LIKE '%${user.email}%')
-                AND  value_date BETWEEN '${fromDate}' AND '${toDate}'`
-        my_query += hostName ? ` AND CONCAT(first_name,' ',last_name) = '${hostName}'` : ''
-        my_query += title ? ` AND title = '${title}'` : ''
-        my_query += ` ORDER BY value_date`
+                AND  value_date BETWEEN '${fromDate}' AND '${toDate}'`;
+        my_query += hostName ? ` AND CONCAT(first_name,' ',last_name) = '${hostName}'` : '';
+        my_query += title ? ` AND title = '${title}'` : '';
+        my_query += ` ORDER BY value_date`;
         
         let res = await db.query(my_query);                                                                             
           for (i = 0; i < res.rows.length; i++) { 
-            res.rows[i].link = res.rows[i].link + user.first_name
+            res.rows[i].link = res.rows[i].link + user.first_name;
             }
         return res.rows;
     } 

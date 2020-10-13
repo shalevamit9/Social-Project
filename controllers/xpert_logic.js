@@ -10,7 +10,7 @@ const validateEmail = async(emailArray, hostEmail)=> {
             if (emailSet.size !== emailArray.length){
                 throw new Error('Duplicate emails', 405);
             }
-            let emails = "{" 
+            let emails = "{" ;
             let first = emailArray.shift();
             if (validator.validate(first.trim()) == false) {
                 throw new Error('invalid email', 405);
@@ -19,7 +19,7 @@ const validateEmail = async(emailArray, hostEmail)=> {
                 throw new Error('host cant add himself as participant', 405);
             }
             else{
-                emails += first
+                emails += first;
             }
             
             for (email of emailArray){
@@ -30,7 +30,7 @@ const validateEmail = async(emailArray, hostEmail)=> {
                     throw new Error('host cant add himself as participant', 405);
                 }
                 else{
-                    emails += `, ${email}`
+                    emails += `, ${email}`;
                 }
             }
             return (emails + '}')
