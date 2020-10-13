@@ -8,6 +8,7 @@ require('dotenv').config();
 /* Importing the pool. */
 const queries = require('../utils/queries');
 const errorHandler = require('../utils/errors');
+const { stream } = require('../utils/redis');
 
 /**
  * Method gets called on '/users/:id'. The id is given.
@@ -158,11 +159,28 @@ const getDaysSinceLastPasswordChange = async (req, res, next) => {
     }
 }
 
+const matchBirthday = async (req, res, next) => {
+    try {
+        const givenDate = req.body.date;
+
+        /* parse date to format: dd//mm */
+        const dateToCompare = givenDate.replace(/\./g, '/').slice(0,-5);
+        
+        const users = await queries.getUsersByGivenBirthday(dateToCompare);
+
+        res.json(users);
+    }
+    catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     createNewUser: createNewUser,
     updateUser: updateUser,
     deleteUser: deleteUser,
     getAllUsers: getAllUsers,
     getUser: getUser,
-    getDaysSinceLastPasswordChange: getDaysSinceLastPasswordChange
+    getDaysSinceLastPasswordChange: getDaysSinceLastPasswordChange,
+    matchBirthday: matchBirthday
 };

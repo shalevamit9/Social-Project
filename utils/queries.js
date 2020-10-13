@@ -16,6 +16,24 @@ const getAllUsersFromDB = async () => {
     }
 };
 
+const getUsersByGivenBirthday = async (dateToCompare) => {
+    try {
+        console.log(dateToCompare);
+
+        const users = await db.query(`
+        SELECT first_name, last_name, email, birth_date
+        FROM user_details
+        WHERE birth_date LIKE $1`, [dateToCompare + '%']);
+
+        console.log(users);
+
+        return users.rows;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
 const insertUserCredentialsToDB = async (user) => {
     try {
         const result = await db.query(`INSERT INTO user_credentials VALUES($1, $2, $3)`, [user.ID, user.password, new Date(Date.now())]);
@@ -347,6 +365,7 @@ module.exports = {
     insertUserCredentialsToDB: insertUserCredentialsToDB,
     insertUserToDB: insertUserToDB,
     getUserById: getUserById,
+    getUsersByGivenBirthday: getUsersByGivenBirthday,
     getDaysSinceLastPasswordChangeInDB: getDaysSinceLastPasswordChangeInDB,
     isUserInDB: isUserInDB,
     updateUserInDB: updateUserInDB,
