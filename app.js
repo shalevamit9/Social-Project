@@ -8,6 +8,7 @@ const usersRoutes = require('./routes/users');
 const committeeRoutes = require('./routes/committee');
 const inboxRoutes = require('./routes/inbox');
 const newsRoutes = require('./routes/news');
+const xpertesyRoutes = require('./routes/xpertesy');
 
 /* Initialize server */
 const app = express();
@@ -24,6 +25,7 @@ app.use(usersRoutes);
 app.use(committeeRoutes);
 app.use(inboxRoutes);
 app.use(newsRoutes);
+app.use(xpertesyRoutes);
 
 app.use((error, req, res, next) => {
     console.log(error);
