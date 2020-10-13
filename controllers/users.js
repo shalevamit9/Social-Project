@@ -164,7 +164,7 @@ const matchBirthday = async (req, res, next) => {
         const givenDate = req.body.date;
 
         /* parse date to format: dd//mm */
-        const dateToCompare = givenDate.replace(/\./g, '/').slice(0,-5);
+        const dateToCompare = givenDate.slice(0,-5);
         
         const users = await queries.getUsersByGivenBirthday(dateToCompare);
 
