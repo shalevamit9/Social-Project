@@ -20,7 +20,7 @@ This folder contains the following files:
 - `getApplication`
 - `createNewApplication`
 
-**bews.js** - controlls news related operations.
+**news.js** - controlls news related operations.
 - `scrapeNews`
 
 **users.js** - controlls user related operations.
