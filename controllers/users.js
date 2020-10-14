@@ -8,7 +8,6 @@ require('dotenv').config();
 /* Importing the pool. */
 const queries = require('../utils/queries');
 const errorHandler = require('../utils/errors');
-const { stream } = require('../utils/redis');
 
 /**
  * Method gets called on '/users/:id'. The id is given.
@@ -32,8 +31,6 @@ const createNewUser = async (req, res, next) => {
 
         /* User already exists error */
         if (existingUser) {
-
-            /* not sure what to return */
             throw errorHandler('User already exists', 409);
         }
         
