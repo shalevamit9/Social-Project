@@ -27,11 +27,15 @@ const createNewUser = async (req, res, next) => {
             phone: req.body.phone
         };
 
-        const existingUser = await queries.getUserById(newUser.ID);
+        const existingUserById = await queries.getUserById(newUser.ID);
+        const existingUserByEmail = await queries.getUserByEmail(newUser.email);
 
         /* User already exists error */
-        if (existingUser) {
+        if (existingUserById) {
             throw errorHandler('User already exists', 409);
+        }
+        else if (existingUserByEmail) {
+            throw errorHandler('Email already exists', 409);
         }
         
         /* User does not exists. Creating new user */

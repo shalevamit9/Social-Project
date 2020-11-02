@@ -6,7 +6,7 @@ let datetime = new Date();
 // use of email_validator module to check if the mails are corrects
 const validateEmail = async(emailArray, hostEmail)=> {
         try{
-            let emailSet = new Set(emailArray)
+            let emailSet = new Set(emailArray);
             if (emailSet.size !== emailArray.length){
                 throw new Error('Duplicate emails', 405);
             }
@@ -33,7 +33,10 @@ const validateEmail = async(emailArray, hostEmail)=> {
                     emails += `, ${email}`;
                 }
             }
-            return (emails + '}')
+            // return (emails + '}')
+            emailArray.unshift(first);
+
+            return emailArray;
         }
         catch(err){
             throw err;

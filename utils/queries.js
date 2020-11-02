@@ -34,6 +34,26 @@ const getUsersByGivenBirthday = async (dateToCompare) => {
     }
 }
 
+const getUsersByEmail = async (emails) => {
+    try {
+        let query = `
+        SELECT * FROM user_details
+        WHERE
+        `;
+
+        emails.forEach(email => query += ` email = '${email}' or`);
+
+        query = query.slice(0, query.length - 3);
+
+        const result = await db.query(query);
+
+        return result.rows;
+    }
+    catch (error) {
+        throw error
+    }
+}
+
 const insertUserCredentialsToDB = async (user) => {
     try {
         const result = await db.query(`INSERT INTO user_credentials VALUES($1, $2, $3)`, [user.ID, user.password, new Date(Date.now())]);
@@ -86,6 +106,22 @@ const getUserById = async (userID) => {
         USING(user_id)
         WHERE user_id=$1`, [userID]);
         
+        return result.rows[0];
+    }
+    catch (error) {
+        throw error;
+    }
+};
+
+const getUserByEmail = async (email) => {
+    try {
+        const result = await db.query(`
+        SELECT * FROM user_details
+        INNER JOIN
+        user_credentials
+        USING(user_id)
+        WHERE email=$1`, [email]);
+
         return result.rows[0];
     }
     catch (error) {
@@ -365,7 +401,9 @@ module.exports = {
     insertUserCredentialsToDB: insertUserCredentialsToDB,
     insertUserToDB: insertUserToDB,
     getUserById: getUserById,
+    getUserByEmail: getUserByEmail,
     getUsersByGivenBirthday: getUsersByGivenBirthday,
+    getUsersByEmail: getUsersByEmail,
     getDaysSinceLastPasswordChangeInDB: getDaysSinceLastPasswordChangeInDB,
     isUserInDB: isUserInDB,
     updateUserInDB: updateUserInDB,
