@@ -86,7 +86,27 @@ const getUser = async (req, res, next) => {
     catch (error) {
         next(error);
     }
-}
+};
+
+const getSpecificUser = async (req, res, next) => {
+    try {
+        const fetchedUser = await queries.getUserById(req.params.id);
+
+        const user = {
+            firstName: fetchedUser.first_name,
+            lastName: fetchedUser.last_name,
+            email: fetchedUser.email,
+            userType: fetchedUser.type,
+            contactUser: fetchedUser.contacts,
+            birthday: fetchedUser.birth_date
+        };
+
+        res.status(200).json([user]);
+    }
+    catch (error) {
+        next(error);
+    }
+};
 
 /**
  * This method updates user's information in DB.
@@ -182,6 +202,7 @@ module.exports = {
     deleteUser: deleteUser,
     getAllUsers: getAllUsers,
     getUser: getUser,
+    getSpecificUser: getSpecificUser,
     getDaysSinceLastPasswordChange: getDaysSinceLastPasswordChange,
     matchBirthday: matchBirthday
 };
