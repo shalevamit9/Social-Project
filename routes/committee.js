@@ -9,7 +9,7 @@ const validation = require('../middleware/validation');
 const router = express.Router();
 
 /* Handles all chairpersons and committees related actions */
-router.get('/committeeParticipants:committeeName', authorization.formatAndSetToken, authorization.verifyToken, committeeController.getAllCommitteeParticipants);
+router.get('/committeeParticipants/:committeeName', authorization.formatAndSetToken, authorization.verifyToken, committeeController.getAllCommitteeParticipants);
 router.post('/committees', authorization.formatAndSetToken, authorization.verifyToken, committeeController.createNewParticipant);
 router.patch('/committees/:committeeName', authorization.formatAndSetToken, authorization.verifyToken, committeeController.updateCommitteeParticipantRole);
 router.delete('/committees/:committeeName', authorization.formatAndSetToken, authorization.verifyToken, committeeController.deleteCommitteeParticipant);
