@@ -98,7 +98,8 @@ const getSpecificUser = async (req, res, next) => {
             email: fetchedUser.email,
             userType: fetchedUser.type,
             contactUser: fetchedUser.contacts,
-            birthday: fetchedUser.birth_date
+            birthday: fetchedUser.birth_date,
+            phoneNumber: fetchedUser.phone
         };
 
         res.status(200).json([user]);
