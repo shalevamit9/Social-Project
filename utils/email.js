@@ -15,7 +15,21 @@ const mailOptions = {
     // html: `html code`
 };
 
+const sendMail = async (participant, subject, html) => {
+    mailOptions.to = participant.email;
+    mailOptions.subject = subject;
+    mailOptions.html = html;
+
+    transporter.sendMail(mailOptions, function (err, info) {
+        if (err) {
+            console.log(err);
+        }
+    });
+}
+
+
 module.exports = {
     transporter: transporter,
-    mailOptions: mailOptions
+    mailOptions: mailOptions,
+    sendMail: sendMail
 };

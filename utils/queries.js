@@ -352,7 +352,6 @@ const showFutureRooms = async (userID, hostName, title, datetime) => {
 
 const showPastRooms = async (userID, hostName, title, datetime) => {
     try {
-
         let user = await getUserById(userID)
         my_query = `SELECT DISTINCT title, CONCAT(first_name,' ',last_name) AS host_name, participants, value_date, link FROM xpertesy as x JOIN user_details as u ON
                 (u.user_id = x.host_id), unnest(participants) as participant  
@@ -375,8 +374,7 @@ const showPastRooms = async (userID, hostName, title, datetime) => {
 
 const showBetweenRooms = async (userID, hostName, title, fromDate, toDate) => {
     try {
-
-        let user = await getUserById(userID)
+        let user = await getUserById(userID);
         my_query = `SELECT DISTINCT title, CONCAT(first_name,' ',last_name) AS host_name, participants, value_date, link FROM xpertesy as x JOIN user_details as u ON
                 (u.user_id = x.host_id), unnest(participants) as participant  
                 WHERE (host_id = ${user.user_id} OR  participant  LIKE '%${user.email}%')
@@ -387,7 +385,7 @@ const showBetweenRooms = async (userID, hostName, title, fromDate, toDate) => {
 
         let res = await db.query(my_query);
         for (i = 0; i < res.rows.length; i++) {
-            res.rows[i].link = res.rows[i].link + user.first_name;
+            res.rows[i].link = res.rows[i].link + user.first_name + '+' + user.last_name;
         }
         return res.rows;
     }
@@ -395,6 +393,23 @@ const showBetweenRooms = async (userID, hostName, title, fromDate, toDate) => {
         throw err;
     }
 }
+
+const insertGoodWord = async (senderID, receiverID, content) => {
+
+    const result = await db.query(`
+    INSERT INTO good_feedback VALUES ($1, $2, $3, $4, $5)
+    `, [senderID, receiverID, content, new Date(Date.now()), null]);
+};
+
+const getUserGoodWords = async (receiverID) => {
+    const result = await db.query(`
+    SELECT user_id_given_feedback as sender, user_id as receiver, content as input
+    FROM good_feedback
+    WHERE user_id=$1 and state IS NOT NULL
+    `, [receiverID]);
+
+    return result.rows;
+};
 
 module.exports = {
     getAllUsersFromDB: getAllUsersFromDB,
@@ -419,5 +434,7 @@ module.exports = {
     addRoom: addRoom,
     showFutureRooms: showFutureRooms,
     showPastRooms: showPastRooms,
-    showBetweenRooms: showBetweenRooms
+    showBetweenRooms: showBetweenRooms,
+    insertGoodWord: insertGoodWord,
+    getUserGoodWords: getUserGoodWords
 };
