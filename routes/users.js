@@ -41,6 +41,8 @@ router.patch('/users/:id', authorization.formatAndSetToken, authorization.verify
 router.delete('/users/:id', authorization.formatAndSetToken, authorization.verifyToken, usersController.deleteUser);
 
 /* Returns array of users with birthday matching given date. */
-router.get('/userBirthdays', authorization.formatAndSetToken, authorization.verifyToken, usersController.matchBirthday)
+router.get('/userBirthdays', authorization.formatAndSetToken, authorization.verifyToken, usersController.matchBirthday);
+
+router.post('/changePassword/:id', authorization.formatAndSetToken, authorization.verifyToken, usersController.changePassword);
 
 module.exports = router;

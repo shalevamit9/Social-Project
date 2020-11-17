@@ -54,7 +54,22 @@ const createNewApplication = async (req, res, next) => {
     }
 }
 
+const getAllInboxesForUser = async (req, res, next) => {
+    try {
+        const userID = req.body.userID;
+        const isSender = true;
+        const inboxes = await queries.getAllApplicationsForUser(userID, isSender);
+
+        res.status(200).json(inboxes);
+    }
+    catch (error) {
+        next(error);
+    }
+
+}
+
 module.exports = {
     getApplication: getApplication,
-    createNewApplication: createNewApplication
+    createNewApplication: createNewApplication,
+    getAllInboxesForUser: getAllInboxesForUser
 };

@@ -8,6 +8,9 @@ const router = express.Router();
 router.get('/goodWord', authorization.formatAndSetToken, authorization.verifyToken, goodWordController.getGoodWord);
 
 // Create a good word
-router.post('/goodWord/:id', authorization.formatAndSetToken, authorization.verifyToken, goodWordController.createGoodWord);
+router.post('/goodWord', authorization.formatAndSetToken, authorization.verifyToken, goodWordController.createGoodWord);
+
+// Update a good word
+router.patch('/goodWord', authorization.formatAndSetToken, authorization.verifyToken, goodWordController.updateGoodWord);
 
 module.exports = router;

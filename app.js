@@ -29,6 +29,10 @@ app.use(newsRoutes);
 app.use(xpertesyRoutes);
 app.use(goodWordRoutes);
 
+app.use('/', (req, res, next) => {
+    res.send('I\'m up and running');
+});
+
 app.use((error, req, res, next) => {
     console.log(error);
     const status = error.statusCode || 500;
@@ -38,4 +42,4 @@ app.use((error, req, res, next) => {
 });
 
 /* Listening */
-app.listen(process.env.PORT || 8080);
+app.listen(process.env.PORT || 5010);

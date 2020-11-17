@@ -204,7 +204,8 @@ const deleteUserFromDB = async (userId) => {
 
 const updateColumn = async (table, column, data, userID) => {
     try {
-        await db.query(`UPDATE ${table} SET ${column} = ${data} WHERE user_id = ${userID}`);
+        const query = (`UPDATE ${table} SET ${column} = $1 WHERE user_id = ${userID}`);
+        await db.query(query, [data]);
     }
     catch (error) {
         throw error;
@@ -233,18 +234,36 @@ const getApplicationByID = async (applicationID) => {
     }
 }
 
+const getAllApplicationsForUser = async (userID, isSender) => {
+    try {
+        let column = 'sender_id';
+
+        if (!isSender) {
+            column = 'receiver_id';
+        }
+
+        const result = await db.query(`SELECT * FROM inbox WHERE ${column} = ${userID}`);
+
+        return result.rows;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
 const insertNewApplication = async (application) => {
     try {
         const result = await db.query(
             `INSERT INTO inbox 
-            (receiver, sender, subject, content, time) 
-            VALUES ($1,$2,$3,$4,$5)`,
+            (receiver_id, sender_id, subject, content, time, is_open)
+            VALUES ($1,$2,$3,$4,$5,$6)`,
             [
                 application.receiverID,
                 application.senderID,
                 application.subject,
                 application.content,
-                application.time
+                application.time,
+                true
             ]
         );
         
@@ -394,12 +413,12 @@ const showBetweenRooms = async (userID, hostName, title, fromDate, toDate) => {
     }
 }
 
-const insertGoodWord = async (senderID, receiverID, content) => {
-
-    const result = await db.query(`
-    INSERT INTO good_feedback VALUES ($1, $2, $3, $4, $5)
-    `, [senderID, receiverID, content, new Date(Date.now()), null]);
+const insertGoodWord = async (goodWord) => {
+    await db.query(`
+    INSERT INTO good_feedback (sender_id, receiver_id, committee_name, content, time) VALUES ($1, $2, $3, $4, $5)
+    `, [goodWord.senderID, goodWord.receiverID, goodWord.committeeName, goodWord.content, new Date(Date.now())]);
 };
+
 
 const getUserGoodWords = async (receiverID) => {
     const result = await db.query(`
@@ -410,6 +429,22 @@ const getUserGoodWords = async (receiverID) => {
 
     return result.rows;
 };
+
+const updateGoodWordInDB = async (goodWord) => {
+    const result = await db.query(`
+    UPDATE good_feedback
+    SET state=$1
+    WHERE serial_id=$2`, [goodWord.state, goodWord.serialNumber]);
+
+    return result.rowCount !== 0;
+}
+
+const getLastRowOfTable = async (tableName, orderByValue) => {    
+    const result = await db.query(`SELECT * FROM ${tableName} ORDER BY ${orderByValue} DESC`);
+    const lastRow = result.rows[0];
+
+    return lastRow;    
+}
 
 module.exports = {
     getAllUsersFromDB: getAllUsersFromDB,
@@ -426,6 +461,7 @@ module.exports = {
     updateColumn: updateColumn,
     getAllInfoFromTable: getAllInfoFromTable,
     getApplicationByID: getApplicationByID,
+    getAllApplicationsForUser: getAllApplicationsForUser,
     insertNewApplication: insertNewApplication,
     getAllCommitteeParticipantsDB: getAllCommitteeParticipantsDB,
     insertNewCommitteeParticipant: insertNewCommitteeParticipant,
@@ -436,5 +472,7 @@ module.exports = {
     showPastRooms: showPastRooms,
     showBetweenRooms: showBetweenRooms,
     insertGoodWord: insertGoodWord,
-    getUserGoodWords: getUserGoodWords
+    getUserGoodWords: getUserGoodWords,
+    updateGoodWordInDB: updateGoodWordInDB,
+    getLastRowOfTable: getLastRowOfTable
 };

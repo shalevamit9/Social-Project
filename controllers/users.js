@@ -197,6 +197,30 @@ const matchBirthday = async (req, res, next) => {
     }
 }
 
+const changePassword = async (req, res, next) => {
+    try {
+        const user = await queries.getUserById(req.params.id);
+        const oldPassword = user.password;
+        const newPassword = req.body.password;
+        const isNewPassEqualsOldPass = oldPassword === newPassword;
+
+        console.log(user, oldPassword, newPassword, isNewPassEqualsOldPass);
+
+        if (!isNewPassEqualsOldPass) {
+            // Execute if the passwords don't match
+            await queries.updateColumn('user_credentials', 'password', newPassword, user.user_id);
+            res.status(201).json(true);
+        }
+        else {
+            // Execute if the passwords do match
+            res.status(400).json(false);
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     createNewUser: createNewUser,
     updateUser: updateUser,
@@ -205,5 +229,6 @@ module.exports = {
     getUser: getUser,
     getSpecificUser: getSpecificUser,
     getDaysSinceLastPasswordChange: getDaysSinceLastPasswordChange,
-    matchBirthday: matchBirthday
+    matchBirthday: matchBirthday,
+    changePassword: changePassword
 };
