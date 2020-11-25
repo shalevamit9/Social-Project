@@ -24,7 +24,7 @@ router.post('/users', usersController.createNewUser);
 /**
  * User credentials are verified. If credentials are valid,
  * a token is signed and sent. Else, sends a 403.
- */
+ */                                          // TODO add 180 days password reset
 router.post('/loginManager/login', validation.verifyUser, authorization.signJWTandSendToken);
 
 router.get('/loginManager/passwordExceeded', validation.verifyUser, usersController.getDaysSinceLastPasswordChange);

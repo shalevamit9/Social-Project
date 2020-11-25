@@ -1,80 +1,79 @@
 const puppeteer = require('puppeteer');
 const $ = require('cheerio');
-const eduUrls = ['https://edu.gov.il/owlHeb/Pages/NewsAgg.aspx',
-    'https://edu.gov.il/owlHeb/Pages/NewsAgg.aspx#k=#s=11',
-    'https://edu.gov.il/owlHeb/Pages/NewsAgg.aspx#k=#s=21',
-    'https://edu.gov.il/owlHeb/Pages/NewsAgg.aspx#k=#s=31',
-    'https://edu.gov.il/owlHeb/Pages/NewsAgg.aspx#k=#s=41'
-]
 
-const knessetUrl = 'https://main.knesset.gov.il/News/PressReleases/Pages/default.aspx';
-const knessetBasrUrl = 'https://main.knesset.gov.il';
+const scrapeNews = async (req, res, next) => {
+    const keyword = req.query.filterBy;
 
-
-exports.scrapeNews = async(req, res) => {
-
-    const { filterBy } = req.query;
+    const eduURL = 'https://edu.gov.il/owlHeb/Pages/NewsAgg.aspx';
+    const knessetURL = 'https://main.knesset.gov.il/News/PressReleases/Pages/default.aspx';
+    const knessetHTTP = 'https://main.kneseet.gov.il';
 
     try {
-        let results = []
-        const browser = await puppeteer.launch({ headless: true });
-        const page = await browser.newPage();
 
-        for (let i = 0; i < eduUrls.length; i++) { // scrape edu.gov
-            await page.goto(eduUrls[i]);
-            await page.waitFor(800);
+        // EDU
+        let results = [];
+        const browser = await puppeteer.launch({ headless: false });
+        const eduPage = await browser.newPage();
+        const knessetPage = await browser.newPage();
+        await eduPage.waitForNavigation(eduPage.goto(eduURL, { waitUntil: 'domcontentloaded' }));
+        await eduPage.waitForSelector('.secondary');
+        let html = await eduPage.content();
 
-            const html = await page.content();
-
-
-            const newsOnjList = $('.secondary .container', html).map((i, e) => {
-                return {
-                    name: $(e).find('h2').text(),
-                    summary: $(e).find('.text').text(),
-                    date: $(e).find('span:first-child').text(),
-                    link: $(e).find('a').attr('href')
-                }
-            }).get();
-
-            results.push(...newsOnjList);
-        }
-        if (filterBy) results = results.filter(e => e.name.includes(filterBy))
-
-        // scrape edu.gov        
-        await page.goto(knessetUrl);
-
-        if (filterBy) {
-            await page.waitFor(2000);
-            await page.type('input[id=subject]', filterBy, { delay: 20 })
-            await page.click('.submitButton');
-            await page.waitFor(1000);
-        }
-        await page.waitFor(300);
-
-        const html = await page.content();
-
-
-        const newsOnjList = $('#KnessetNewsLobbyMainContainerDiv > div > div > div.main-container-left-side > div.item.news-content > ul li', html).map((i, e) => {
+        let newsOnEDU = $('.secondary .container', html).map((i, element) => {
             return {
-                name: $(e).find('.news-header').text(),
-                summary: $(e).find('.news-content').text(),
-                date: $(e).find('.news-date').text(),
-                link: knessetBasrUrl + $(e).find('a').attr('href')
+                name: $(element).find('h2').text(),
+                summary: $(element).find('.text').text(),
+                date: $(element).find('span:first-child').text(),
+                link: $(element).find('a').attr('href')
             }
         }).get();
 
-        results.push(...newsOnjList);
+        if (keyword) {
+            newsOnEDU = newsOnEDU.filter(
+                newsPiece => newsPiece.name.includes(keyword) || newsPiece.summary.includes(keyword)
+            );
+        }
 
+        results.push(...newsOnEDU);
+
+        // KNESSET
+        
+        await knessetPage.waitForNavigation(knessetPage.goto(knessetURL));
+        await knessetPage.waitForSelector('.submitButton');
+        await knessetPage.waitForSelector('input[id=subject]');
+        
+        if (keyword) {
+            await knessetPage.type(`input[id=subject]`, keyword, { delay: 10 });
+            await knessetPage.click('.submitButton');
+        }
+
+        html = await knessetPage.content();
+
+        const selector = '#KnessetNewsLobbyMainContainerDiv > div > div > div.main-container-left-side > div.item.news-content > ul li';
+
+        const newsOnKnesset = $(selector, html).map((i, element) => {
+            return {
+                name: $(element).find('.news-header').text(),
+                summary: $(element).find('.news-content').text(),
+                date: $(element).find('.news-date').text(),
+                link: knessetHTTP + $(element).find('a').attr('href')
+            }
+        }).get();
+
+        results.push(...newsOnKnesset);
+
+        // RESULTS
         await browser.close();
-
         res.status(200).json({
             news: results
         });
-        //res.send
-
-    } catch (err) {
-        res.status(404).json({
-            err: err
-        })
     }
-}
+    catch (error) {
+        next(error);
+    }
+
+};
+
+module.exports = {
+    scrapeNews: scrapeNews
+};

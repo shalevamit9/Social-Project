@@ -43,7 +43,6 @@ const updateGoodWord = async (req, res, next) => {
 
     try {
         const isUpdated = await queries.updateGoodWordInDB(goodWordData);
-        console.log(isUpdated);
 
         if (isUpdated) {
             res.status(201).json(true);

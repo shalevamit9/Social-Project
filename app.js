@@ -29,8 +29,9 @@ app.use(newsRoutes);
 app.use(xpertesyRoutes);
 app.use(goodWordRoutes);
 
+// middleware that send a message to the browser that the server is running
 app.use('/', (req, res, next) => {
-    res.send('I\'m up and running');
+    res.send('Hello word');
 });
 
 app.use((error, req, res, next) => {

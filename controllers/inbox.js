@@ -58,7 +58,7 @@ const getAllInboxesForUser = async (req, res, next) => {
     try {
         const userID = req.body.userID;
         const isSender = true;
-        const inboxes = await queries.getAllApplicationsForUser(userID, isSender);
+        const inboxes = await queries.getAllApplicationsForUser(userID, isSender); // TODO get sender or receiver messages
 
         res.status(200).json(inboxes);
     }

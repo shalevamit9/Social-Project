@@ -72,6 +72,7 @@ const showRooms = async (req, res, next) => {
             throw new Error('invalid dates', 405);
         }
         
+        // calibrate??
         fixDates(tables);
         
         res.json({ Data: tables });
@@ -86,7 +87,7 @@ const fixDates = (meetings) => {
     meetings.forEach(meeting => {
         const localISOTime = (new Date(meeting.value_date - tzoffset)).toISOString().slice(0, -5).replace('T', ' ');
         meeting.value_date = localISOTime;
-    })
+    });
 };
 
 const setEmails = (usersArray, meetingLink) => {

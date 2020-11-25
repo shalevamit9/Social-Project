@@ -204,8 +204,6 @@ const changePassword = async (req, res, next) => {
         const newPassword = req.body.password;
         const isNewPassEqualsOldPass = oldPassword === newPassword;
 
-        console.log(user, oldPassword, newPassword, isNewPassEqualsOldPass);
-
         if (!isNewPassEqualsOldPass) {
             // Execute if the passwords don't match
             await queries.updateColumn('user_credentials', 'password', newPassword, user.user_id);
