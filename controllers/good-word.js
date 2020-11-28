@@ -1,12 +1,18 @@
 const queries = require('../utils/queries');
-const errorHandler = require('../utils/errors');
 
 // Function that gets all the good words for a specific user
-const getGoodWord = async (req, res, next) => {
-    const receiverID = parseInt(req.body.id);
+const getGoodWords = async (req, res, next) => {
+    const parameters = {
+        sender_id: req.body.sender_id,
+        receiver_id: req.body.receiver_id,
+        committee_name: req.body.committee_name,
+        content: req.body.content,
+        serial_id: req.body.serial_number,
+        state: req.body.status
+    };
 
     try {
-        const goodWords = await queries.getUserGoodWords(receiverID);
+        const goodWords = await queries.getGoodWordsFromDB(parameters);
 
         res.status(200).json(goodWords);
     }
@@ -57,7 +63,7 @@ const updateGoodWord = async (req, res, next) => {
 };
 
 module.exports = {
-    getGoodWord: getGoodWord,
+    getGoodWords: getGoodWords,
     createGoodWord: createGoodWord,
     updateGoodWord: updateGoodWord
 };

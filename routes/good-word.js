@@ -5,7 +5,7 @@ const goodWordController = require('../controllers/good-word');
 const router = express.Router();
 
 // Get good word for a specific user
-router.get('/goodWord', authorization.formatAndSetToken, authorization.verifyToken, goodWordController.getGoodWord);
+router.get('/goodWord', authorization.formatAndSetToken, authorization.verifyToken, goodWordController.getGoodWords);
 
 // Create a good word
 router.post('/goodWord', authorization.formatAndSetToken, authorization.verifyToken, goodWordController.createGoodWord);

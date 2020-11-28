@@ -419,13 +419,51 @@ const insertGoodWord = async (goodWord) => {
     `, [goodWord.senderID, goodWord.receiverID, goodWord.committeeName, goodWord.content, new Date(Date.now())]);
 };
 
+/**
+ * 
+ * @param {*} parameters is an object that contain data to filter the query with it.
+ */
+const getGoodWordsFromDB = async (parameters) => {
+    
+    // Initial query
+    let searchQuery = 'SELECT * FROM good_feedback ';
 
-const getUserGoodWords = async (receiverID) => {
-    const result = await db.query(`
-    SELECT user_id_given_feedback as sender, user_id as receiver, content as input
-    FROM good_feedback
-    WHERE user_id=$1 and state IS NOT NULL
-    `, [receiverID]);
+    // isObjectEmpty will be assigned true if all the values in parameters object are implicitly false.
+    // Else, isObjectEmpty will be assigned false, meaning there's at least one value defined.
+    const isObjectEmpty = Object.values(parameters).every(param => !param);
+
+    // If isObjectEmpty is false OR state is explicitly assigned false OR null
+    if (!isObjectEmpty || parameters.state === null || parameters.state === false) {
+        
+        searchQuery += 'WHERE ';
+
+        // If state is explicitly defined as null
+        if (parameters.state === null) {
+            searchQuery += 'state IS NULL AND ';
+        }
+
+        // index for managing the query parameters
+        let index = 1;
+        for (const param in parameters) {
+
+            // If the value is defined OR the value is explicitly defined as false
+            if (parameters[param] || parameters[param] === false) {
+
+                // Adjusting the query parameters index
+                searchQuery += `${param}=$${index++} AND `;
+            }
+        }
+
+        // Removing the last 5 chars (' AND ')
+        searchQuery = searchQuery.slice(0, -5);
+    }
+    
+    // Returns an array of the query parameters
+    const queryParams = Object.values(parameters).filter(param => param || param === false);
+    
+    // Return the result of the dynamically adjusted query,
+    // with an array of parameters for the query.
+    const result = await db.query(searchQuery, queryParams);
 
     return result.rows;
 };
@@ -472,7 +510,7 @@ module.exports = {
     showPastRooms: showPastRooms,
     showBetweenRooms: showBetweenRooms,
     insertGoodWord: insertGoodWord,
-    getUserGoodWords: getUserGoodWords,
+    getGoodWordsFromDB: getGoodWordsFromDB,
     updateGoodWordInDB: updateGoodWordInDB,
     getLastRowOfTable: getLastRowOfTable
 };
