@@ -17,7 +17,7 @@ const getGoodWords = async (req, res, next) => {
         res.status(200).json(goodWords);
     }
     catch (error) {
-        next(error)
+        next(error);
     }
 };
 
