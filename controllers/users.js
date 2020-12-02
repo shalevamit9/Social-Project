@@ -78,7 +78,8 @@ const getUser = async (req, res, next) => {
             email: fetchedUser.email,
             userType: fetchedUser.type,
             contactUser: fetchedUser.contacts,
-            birthday: fetchedUser.birth_date
+            birthday: fetchedUser.birth_date,
+            phone: fetchedUser.phone
         };
 
         res.status(200).json(user);
