@@ -336,6 +336,12 @@ const deleteCommitteeParticipantDB = async (participant) => {
     }
 }
 
+const getAllCommitteeNamesFromDB = async () => {
+    const result = await db.query('SELECT committee_name as name from committee');
+
+    return result.rows;
+};
+
 const addRoom = async (link, userID, participants, time, title) => {
     try {
         let res = await db.query(`INSERT INTO "xpertesy" (link, host_id, participants, value_date, title)
