@@ -59,7 +59,7 @@ const insertUserCredentialsToDB = async (user) => {
         const result = await db.query(`INSERT INTO user_credentials VALUES($1, $2, $3)`, [user.ID, user.password, new Date(Date.now())]);
     }
     catch (error) {
-        next(error);
+        throw(error);
     }
 }
 
@@ -505,6 +505,7 @@ module.exports = {
     insertNewCommitteeParticipant: insertNewCommitteeParticipant,
     updateCommitteeParticipantRoleDB: updateCommitteeParticipantRoleDB,
     deleteCommitteeParticipantDB: deleteCommitteeParticipantDB,
+    getAllCommitteeNamesFromDB,
     addRoom: addRoom,
     showFutureRooms: showFutureRooms,
     showPastRooms: showPastRooms,

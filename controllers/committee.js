@@ -151,11 +151,23 @@ const deleteCommitteeParticipant = async (req, res, next) => {
     catch (error) {
         next(error);
     }
-}
+};
+
+const getCommitteeNames = async (req, res, next) => {
+    try {
+        const committeNames = await queries.getAllCommitteeNamesFromDB();
+
+        res.status(200).json(committeNames);
+    }
+    catch (error) {
+        next(error);
+    }
+};
 
 module.exports = {
-    getAllCommitteeParticipants: getAllCommitteeParticipants,
-    createNewParticipant: createNewParticipant,
-    updateCommitteeParticipantRole: updateCommitteeParticipantRole,
-    deleteCommitteeParticipant: deleteCommitteeParticipant
+    getAllCommitteeParticipants,
+    createNewParticipant,
+    updateCommitteeParticipantRole,
+    deleteCommitteeParticipant,
+    getCommitteeNames
 };

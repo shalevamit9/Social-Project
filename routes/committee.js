@@ -13,5 +13,6 @@ router.get('/committeeParticipants/:committeeName', authorization.formatAndSetTo
 router.post('/committees', authorization.formatAndSetToken, authorization.verifyToken, committeeController.createNewParticipant);
 router.patch('/committees/:committeeName', authorization.formatAndSetToken, authorization.verifyToken, committeeController.updateCommitteeParticipantRole);
 router.delete('/committees/:committeeName', authorization.formatAndSetToken, authorization.verifyToken, committeeController.deleteCommitteeParticipant);
+router.get('/committees', authorization.formatAndSetToken, authorization.verifyToken, committeeController.getCommitteeNames);
 
 module.exports = router;
