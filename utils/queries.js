@@ -491,7 +491,7 @@ const getLastRowOfTable = async (tableName, orderByValue) => {
 }
 
 const getAllImagesFromDB = async () => {
-    const result = await db.query('SELECT path FROM image_rotation');
+    const result = await db.query('SELECT path, is_shown as status FROM image_rotation');
 
     return result.rows;
 };
