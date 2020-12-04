@@ -490,6 +490,65 @@ const getLastRowOfTable = async (tableName, orderByValue) => {
     return lastRow;    
 }
 
+const getAllImagesFromDB = async () => {
+    const result = await db.query('SELECT path FROM image_rotation');
+
+    return result.rows;
+};
+
+const getAllImagesByStatusFromDB = async (status) => {
+    const result = await db.query(
+        `SELECT path FROM image_rotation WHERE is_shown=$1`,
+        [status]);
+    
+    return result.rows;
+};
+
+const insertImagesToDB = async (imagesInfo) => {
+    let query = `
+    INSERT INTO image_rotation (path, is_shown)
+    VALUES `;
+
+    imagesInfo.forEach(imageInfo => {
+        query += `('${imageInfo.path}',${imageInfo.status}), `;
+    });
+
+    query = query.slice(0, -2);
+
+    const result = await db.query(query);
+
+    return result.rowCount !== 0;
+};
+
+const deleteImageFromDB = async (path) => {
+    const result = await db.query(`
+    DELETE FROM image_rotation
+    WHERE path=$1`, [path]);
+
+    return result.rowCount !== 0;
+};
+
+const updateImageStatusInDB = async (imagesInfo) => {
+    let query = `UPDATE image_rotation SET is_shown=CASE `;
+
+    imagesInfo.forEach(imageInfo => {
+        query += `WHEN path='${imageInfo.path}' THEN ${imageInfo.status} `
+    });
+
+    query += `END WHERE path IN (`;
+    
+    imagesInfo.forEach(imageInfo => {
+        query += `'${imageInfo.path}',`
+    });
+
+    query = query.slice(0, -1);
+    query += `)`;
+
+    const result = await db.query(query);
+
+    return result.rowCount !== 0;
+};
+
 module.exports = {
     getAllUsersFromDB: getAllUsersFromDB,
     insertUserCredentialsToDB: insertUserCredentialsToDB,
@@ -519,5 +578,10 @@ module.exports = {
     insertGoodWord: insertGoodWord,
     getGoodWordsFromDB: getGoodWordsFromDB,
     updateGoodWordInDB: updateGoodWordInDB,
-    getLastRowOfTable: getLastRowOfTable
+    getLastRowOfTable: getLastRowOfTable,
+    getAllImagesFromDB,
+    getAllImagesByStatusFromDB,
+    insertImagesToDB,
+    deleteImageFromDB,
+    updateImageStatusInDB
 };
