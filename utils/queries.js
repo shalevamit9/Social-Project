@@ -235,7 +235,26 @@ const getApplicationByID = async (applicationID) => {
 };
 
 const getInboxesByCommitteeNameFromDB = async (committeeName) => {
-    const inboxes = await db.query('SELECT * ');
+    const inboxes = await db.query(`SELECT 
+        inbox_id, 
+        sender_id,
+        committee_name,
+        subject,
+        inbox.content AS inbox_content,
+        inbox.time AS inbox_sending_time,
+        is_open,
+        is_spam,
+        contact_email,
+        contact_phone,
+        priority,
+        type,
+        contact_full_name,
+        handler_id,
+        reply.content AS reply_content,
+        reply.time AS reply_time
+        FROM inbox LEFT JOIN reply USING (inbox_id) WHERE committee_name = '${committeeName}';`);
+    
+    return inboxes.rows;
 };
 
 const getAllApplicationsForUser = async (userID, isSender) => {
@@ -258,6 +277,11 @@ const getAllApplicationsForUser = async (userID, isSender) => {
 const insertNewApplication = async (application) => {
     try {
         const result = await db.query(
+            `INSERT INTO inbox
+            (committee_name)`
+
+
+
             `INSERT INTO inbox 
             (sender_id, 
                 subject, 
@@ -601,6 +625,7 @@ module.exports = {
     getApplicationByID: getApplicationByID,
     getAllApplicationsForUser: getAllApplicationsForUser,
     insertNewApplication: insertNewApplication,
+    getInboxesByCommitteeNameFromDB: getInboxesByCommitteeNameFromDB,
     getAllCommitteeParticipantsDB: getAllCommitteeParticipantsDB,
     insertNewCommitteeParticipant: insertNewCommitteeParticipant,
     updateCommitteeParticipantRoleDB: updateCommitteeParticipantRoleDB,
