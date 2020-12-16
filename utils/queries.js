@@ -229,10 +229,14 @@ const getApplicationByID = async (applicationID) => {
 
         return result.rows[0];
     }
-    catch (error) { 
+    catch (error) {
         throw error;
     }
-}
+};
+
+const getInboxesByCommitteeNameFromDB = async (committeeName) => {
+    const inboxes = await db.query('SELECT * ');
+};
 
 const getAllApplicationsForUser = async (userID, isSender) => {
     try {
@@ -255,15 +259,30 @@ const insertNewApplication = async (application) => {
     try {
         const result = await db.query(
             `INSERT INTO inbox 
-            (receiver_id, sender_id, subject, content, time, is_open)
-            VALUES ($1,$2,$3,$4,$5,$6)`,
+            (sender_id, 
+                subject, 
+                content, 
+                time, 
+                is_open, 
+                is_spam, 
+                contact_email, 
+                contact_phone,
+                priority,
+                type,
+                contact_full_name)
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
             [
-                application.receiverID,
                 application.senderID,
                 application.subject,
                 application.content,
                 application.time,
-                true
+                true,
+                false,
+                application.email,
+                application.phone,
+                application.priority,
+                application.type,
+                application.fullName
             ]
         );
         

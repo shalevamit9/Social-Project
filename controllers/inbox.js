@@ -12,8 +12,8 @@ const getApplication = async (req, res, next) => {
         res.status(200).json({
             data: [
                 {
-                    sender: application.sender,
-                    receiver: application.receiver,
+                    sender: application.sender_id,
+                    committeeName: application.committee_name,
                     subject: application.subject,
                     content: application.content,
                     time_and_date: application.time
@@ -31,13 +31,19 @@ const getApplication = async (req, res, next) => {
  * 
  * Retrieves the new application's information and stores it in the database.
  */
+// TODO - not enough information about the data we receive from UI
 const createNewApplication = async (req, res, next) => {
     try {
         const newApplication = {
-            receiverID: req.body.receiver,
-            senderID: req.body.sender,
+            senderID: req.userID,
+            committeeName: req.body.committeeName,
+            priority: req.body.priority,
+            type: req.body.type,
             subject: req.body.subject,
             content: req.body.content,
+            fullName: req.body.full_name,
+            phone: req.body.phone_number,
+            email: req.body.email,
             time: new Date(Date.now())
         };
         
@@ -46,8 +52,10 @@ const createNewApplication = async (req, res, next) => {
             throw errorHandler('Failed', 500);
         }
 
+        const createdInbox = await queries.getLastRowOfTable('inbox', 'inbox_id');
+
         res.status(201);
-        res.json({ data: true });
+        res.json({ inbox_id: createdInbox.inbox_id });
     }
     catch (error){
         next(error);
@@ -66,10 +74,22 @@ const getAllInboxesForUser = async (req, res, next) => {
         next(error);
     }
 
+};
+
+const getInboxesByCommitteeName = async (req, res, next) => {
+    const committeeName = req.body.committeeName;
+
+    try {
+        const inboxesByCommitteeName = await queries.getInboxesByCommitteeNameFromDB(committeeName);
+    }
+    catch (error) {
+        next(error);
+    }
 }
 
 module.exports = {
-    getApplication: getApplication,
-    createNewApplication: createNewApplication,
-    getAllInboxesForUser: getAllInboxesForUser
+    getApplication,
+    createNewApplication,
+    getAllInboxesForUser,
+    getInboxesByCommitteeName
 };

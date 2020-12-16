@@ -9,5 +9,6 @@ const router = express.Router();
 router.get('/inbox/:id', authorization.formatAndSetToken, authorization.verifyToken, inboxController.getApplication);
 router.post('/inbox', authorization.formatAndSetToken, authorization.verifyToken, inboxController.createNewApplication);
 router.get('/inboxesUser', authorization.formatAndSetToken, authorization.verifyToken, inboxController.getAllInboxesForUser);
+router.get('/inbox/getByCommitteeName', authorization.formatAndSetToken, authorization.verifyToken, inboxController.getInboxesByCommitteeName);
 
 module.exports = router;
