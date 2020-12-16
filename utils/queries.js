@@ -293,6 +293,22 @@ const insertNewApplication = async (application) => {
     }
 }
 
+const createNewCommittee = async (committeeName, committeeDescription, chairPersonID, participantsIDs) => { 
+
+    let query = `
+    INSERT INTO committee (committee_name, committee_information) VALUES ('${committeeName}', '${committeeDescription}');
+    INSERT INTO committee_participants VALUES (${chairPersonID}, '${committeeName}', 'Chairperson'); 
+    `;
+
+    participantsIDs.forEach(participantID => {
+        query += (`INSERT INTO committee_participants VALUES (${participantID}, '${committeeName}', 'Participant');
+        `);
+    });    
+    
+    const result = await db.query(query);
+    return result.rowCount !== 0;
+}
+
 
 /* Untested function - need to test! */
 const getAllCommitteeParticipantsDB = async (committeeName) => {
@@ -355,8 +371,8 @@ const deleteCommitteeParticipantDB = async (participant) => {
     }
 }
 
-const getAllCommitteeNamesFromDB = async () => {
-    const result = await db.query('SELECT committee_name as name from committee');
+const getAllCommitteeNamesAndDescFromDB = async () => {
+    const result = await db.query('SELECT committee_name AS name, committee_information AS desc FROM committee');
 
     return result.rows;
 };
@@ -588,8 +604,9 @@ module.exports = {
     getAllCommitteeParticipantsDB: getAllCommitteeParticipantsDB,
     insertNewCommitteeParticipant: insertNewCommitteeParticipant,
     updateCommitteeParticipantRoleDB: updateCommitteeParticipantRoleDB,
+    createNewCommittee: createNewCommittee,
     deleteCommitteeParticipantDB: deleteCommitteeParticipantDB,
-    getAllCommitteeNamesFromDB,
+    getAllCommitteeNamesAndDescFromDB: getAllCommitteeNamesAndDescFromDB,
     addRoom: addRoom,
     showFutureRooms: showFutureRooms,
     showPastRooms: showPastRooms,

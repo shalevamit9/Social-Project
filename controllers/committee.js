@@ -153,21 +153,41 @@ const deleteCommitteeParticipant = async (req, res, next) => {
     }
 };
 
-const getCommitteeNames = async (req, res, next) => {
+const getCommitteeNamesAndInfo = async (req, res, next) => {
     try {
-        const committeNames = await queries.getAllCommitteeNamesFromDB();
+        const committeNamesAndDesc = await queries.getAllCommitteeNamesAndDescFromDB();
 
-        res.status(200).json(committeNames);
+        res.status(200).json(committeNamesAndDesc);
     }
     catch (error) {
         next(error);
     }
 };
 
+const createCommittee = async (req, res, next) => {
+    try {
+     
+        committeeName = req.body.name;
+        committeeDescription = req.body.description;
+        chairPersonID = req.body.chairman_id;
+        participantsIDs = req.body.participants_id;
+
+        const result = await queries.createNewCommittee(committeeName, committeeDescription, chairPersonID, participantsIDs);
+
+        res.status(201).json(result);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(400).json(false);
+    }
+}
+
+
 module.exports = {
     getAllCommitteeParticipants,
     createNewParticipant,
     updateCommitteeParticipantRole,
     deleteCommitteeParticipant,
-    getCommitteeNames
+    getCommitteeNamesAndInfo,
+    createCommittee
 };
