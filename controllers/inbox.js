@@ -24,7 +24,7 @@ const getApplication = async (req, res, next) => {
     catch (error) {
         next(error);
     }
-}
+};
 
 /**
  * This method creates a new application.
@@ -57,10 +57,10 @@ const createNewApplication = async (req, res, next) => {
         res.status(201);
         res.json({ inbox_id: createdInbox.inbox_id });
     }
-    catch (error){
+    catch (error) {
         next(error);
     }
-}
+};
 
 const getAllInboxesForUser = async (req, res, next) => {
     try {
@@ -78,18 +78,84 @@ const getAllInboxesForUser = async (req, res, next) => {
 
 const getInboxesByCommitteeName = async (req, res, next) => {
     const committeeName = req.body.committeeName;
+    console.log(committeeName);
 
     try {
         const inboxesByCommitteeName = await queries.getInboxesByCommitteeNameFromDB(committeeName);
+
+        res.status(200).json(inboxesByCommitteeName);
     }
     catch (error) {
         next(error);
     }
-}
+};
+
+const getInboxesBySenderId = async (req, res, next) => {
+    const senderID = req.body.senderId;
+
+    try {
+        const inboxesBySenderID = await queries.getInboxesBySenderIDFromDB(senderID);
+
+        res.status(200).json(inboxesBySenderID);
+    }
+    catch (error) {
+        next(error);
+    }
+};
+
+const markAsSpam = async (req, res, next) => {
+    const inboxID = req.body.inbox_id;
+
+    try {
+        const result = await queries.markAsSpamInDB(inboxID);
+        console.log(result);
+
+        if (result) {
+            res.status(200).json(true);
+        }
+        else {
+            res.status(401).json(false);
+        }
+    }
+    catch (error) {
+        next(error)
+    }
+};
+
+const replyToInbox = async (req, res, next) => {
+    try {
+        const reply = {
+            handlerID: req.userID,
+            inboxID: req.body.inbox_id,
+            content: req.body.content,
+            time: new Date(Date.now())
+        }
+
+        const isInboxIDAlreadyExistsInReplyTable = await queries.getReplyByInboxID(reply.inboxID);
+        if (isInboxIDAlreadyExistsInReplyTable) {
+            throw errorHandler('Reply Already Exist', 401);
+        }
+
+        const result = await queries.createNewReply(reply);
+
+        if (result) {
+            res.status(200).json(true);
+        }
+        else {
+            res.status(401).json(false);
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+};
 
 module.exports = {
     getApplication,
     createNewApplication,
     getAllInboxesForUser,
-    getInboxesByCommitteeName
+    getInboxesByCommitteeName,
+    getInboxesBySenderId,
+    markAsSpam,
+    replyToInbox
 };

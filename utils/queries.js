@@ -235,6 +235,7 @@ const getApplicationByID = async (applicationID) => {
 };
 
 const getInboxesByCommitteeNameFromDB = async (committeeName) => {
+    
     const inboxes = await db.query(`SELECT 
         inbox_id, 
         sender_id,
@@ -252,9 +253,60 @@ const getInboxesByCommitteeNameFromDB = async (committeeName) => {
         handler_id,
         reply.content AS reply_content,
         reply.time AS reply_time
-        FROM inbox LEFT JOIN reply USING (inbox_id) WHERE committee_name = '${committeeName}';`);
+        FROM inbox LEFT JOIN reply USING (inbox_id) WHERE committee_name = '${committeeName}'
+        ORDER BY inbox_id;`);
     
     return inboxes.rows;
+};
+
+const getInboxesBySenderIDFromDB = async (senderID) => {
+
+    const inboxes = await db.query(`
+    SELECT
+        inbox_id,
+        sender_id,
+        committee_name,
+        subject,
+        inbox.content AS inbox_content,
+        inbox.time AS inbox_sending_time,
+        is_open,
+        is_spam,
+        contact_email,
+        contact_phone,
+        priority,
+        type,
+        contact_full_name,
+        handler_id,
+        reply.content AS reply_content,
+        reply.time AS reply_time
+        FROM inbox LEFT JOIN reply USING (inbox_id) WHERE sender_id = ${senderID}
+        ORDER BY inbox_id;
+    `);
+
+    return inboxes.rows;
+};
+
+const getReplyByInboxID = async (inboxID) => {
+    const result = await db.query(`SELECT * FROM reply WHERE inbox_id = ${inboxID}`);
+
+    return result.rows[0];
+};
+
+const createNewReply = async (reply) => {
+    const result = await db.query(`INSERT INTO reply VALUES ($1, $2, $3, $4);`, [
+        reply.inboxID,
+        reply.handlerID,
+        reply.content,
+        reply.time
+    ]);
+
+    return result.rowCount;
+};
+
+const markAsSpamInDB = async (inboxID) => {
+    const result = await db.query(`UPDATE inbox SET is_spam = true WHERE inbox_id = ${inboxID}`);
+
+    return result.rowCount !== 0;
 };
 
 const getAllApplicationsForUser = async (userID, isSender) => {
@@ -277,11 +329,6 @@ const getAllApplicationsForUser = async (userID, isSender) => {
 const insertNewApplication = async (application) => {
     try {
         const result = await db.query(
-            `INSERT INTO inbox
-            (committee_name)`
-
-
-
             `INSERT INTO inbox 
             (sender_id, 
                 subject, 
@@ -293,8 +340,9 @@ const insertNewApplication = async (application) => {
                 contact_phone,
                 priority,
                 type,
-                contact_full_name)
-            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+                contact_full_name,
+                committee_name)
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
             [
                 application.senderID,
                 application.subject,
@@ -306,7 +354,8 @@ const insertNewApplication = async (application) => {
                 application.phone,
                 application.priority,
                 application.type,
-                application.fullName
+                application.fullName,
+                application.committeeName
             ]
         );
         
@@ -626,6 +675,10 @@ module.exports = {
     getAllApplicationsForUser: getAllApplicationsForUser,
     insertNewApplication: insertNewApplication,
     getInboxesByCommitteeNameFromDB: getInboxesByCommitteeNameFromDB,
+    getInboxesBySenderIDFromDB: getInboxesBySenderIDFromDB,
+    getReplyByInboxID: getReplyByInboxID,
+    createNewReply: createNewReply,
+    markAsSpamInDB: markAsSpamInDB,
     getAllCommitteeParticipantsDB: getAllCommitteeParticipantsDB,
     insertNewCommitteeParticipant: insertNewCommitteeParticipant,
     updateCommitteeParticipantRoleDB: updateCommitteeParticipantRoleDB,
