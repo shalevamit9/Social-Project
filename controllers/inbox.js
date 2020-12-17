@@ -108,7 +108,6 @@ const markAsSpam = async (req, res, next) => {
 
     try {
         const result = await queries.markAsSpamInDB(inboxID);
-        console.log(result);
 
         if (result) {
             res.status(200).json(true);
