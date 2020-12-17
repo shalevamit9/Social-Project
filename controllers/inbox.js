@@ -78,7 +78,6 @@ const getAllInboxesForUser = async (req, res, next) => {
 
 const getInboxesByCommitteeName = async (req, res, next) => {
     const committeeName = req.body.committeeName;
-    console.log(committeeName);
 
     try {
         const inboxesByCommitteeName = await queries.getInboxesByCommitteeNameFromDB(committeeName);
