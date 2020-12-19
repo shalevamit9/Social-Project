@@ -77,8 +77,8 @@ const getAllInboxesForUser = async (req, res, next) => {
 };
 
 const getInboxesByCommitteeName = async (req, res, next) => {
-    const committeeName = req.body.committeeName;
-
+    const committeeName = req.params.committeeName;
+    
     try {
         const inboxesByCommitteeName = await queries.getInboxesByCommitteeNameFromDB(committeeName);
 
@@ -90,7 +90,7 @@ const getInboxesByCommitteeName = async (req, res, next) => {
 };
 
 const getInboxesBySenderId = async (req, res, next) => {
-    const senderID = req.body.senderId;
+    const senderID = req.params.senderId;
 
     try {
         const inboxesBySenderID = await queries.getInboxesBySenderIDFromDB(senderID);
