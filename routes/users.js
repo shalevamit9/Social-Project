@@ -28,7 +28,7 @@ router.post('/users', authorization.formatAndSetToken, authorization.verifyToken
  */                                          // TODO add 180 days password reset
 router.post('/loginManager/login', validation.verifyUser, authorization.signJWTandSendToken);
 
-router.get('/loginManager/passwordExceeded', validation.verifyUser, usersController.getDaysSinceLastPasswordChange);
+router.post('/loginManager/passwordExceeded', validation.verifyUser, usersController.getDaysSinceLastPasswordChange);
 
 /**
  * Log out procedure. User's token is invalidated.
