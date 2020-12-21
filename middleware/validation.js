@@ -28,6 +28,7 @@ const verifyUser = async (req, res, next) => {
         }
 
         req.userData = userData;
+        req.userData.type = queryUser.type
         next();
     }
     catch (error) {

@@ -4,6 +4,7 @@ const express = require('express');
 const usersController = require('../controllers/users');
 const authorization = require('../middleware/authorization');
 const validation = require('../middleware/validation');
+const permissions = require('../middleware/permission');
 
 /* For handling routes */
 const router = express.Router();
@@ -11,7 +12,7 @@ const router = express.Router();
 /** Returns JSON of all users
  * Creates new user --> sign up
  */
-router.get('/users', authorization.formatAndSetToken, authorization.verifyToken, usersController.getAllUsers);
+router.get('/users', authorization.formatAndSetToken, authorization.verifyToken, permissions.isAdmin, usersController.getAllUsers);
 
 router.get('/user', authorization.formatAndSetToken, authorization.verifyToken, usersController.getUser);
 
@@ -19,7 +20,7 @@ router.get('/user', authorization.formatAndSetToken, authorization.verifyToken, 
 router.get('/user/:id', authorization.formatAndSetToken, authorization.verifyToken, usersController.getSpecificUser);
 
 /* Creates new user */
-router.post('/users', usersController.createNewUser);
+router.post('/users', authorization.formatAndSetToken, authorization.verifyToken, permissions.isAdmin, usersController.createNewUser);
 
 /**
  * User credentials are verified. If credentials are valid,
@@ -38,7 +39,7 @@ router.post('/logout', authorization.formatAndSetToken, authorization.verifyToke
 router.patch('/users/:id', authorization.formatAndSetToken, authorization.verifyToken, usersController.updateUser);
 
 /* Deletes User from DB */
-router.delete('/users/:id', authorization.formatAndSetToken, authorization.verifyToken, usersController.deleteUser);
+router.delete('/users/:id', authorization.formatAndSetToken, authorization.verifyToken, permissions.isAdmin, usersController.deleteUser);
 
 /* Returns array of users with birthday matching given date. */
 router.get('/userBirthdays', authorization.formatAndSetToken, authorization.verifyToken, usersController.matchBirthday);

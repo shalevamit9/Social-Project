@@ -366,7 +366,7 @@ const insertNewApplication = async (application) => {
     }
 }
 
-const createNewCommittee = async (committeeName, committeeDescription, chairPersonID, participantsIDs) => { 
+const createNewCommittee = async (committeeName, committeeDescription, chairPersonID, participantsIDs) => {
 
     let query = `
     INSERT INTO committee (committee_name, committee_information) VALUES ('${committeeName}', '${committeeDescription}');
@@ -376,12 +376,17 @@ const createNewCommittee = async (committeeName, committeeDescription, chairPers
     participantsIDs.forEach(participantID => {
         query += (`INSERT INTO committee_participants VALUES (${participantID}, '${committeeName}', 'Participant');
         `);
-    });    
+    });
     
     const result = await db.query(query);
     return result.rowCount !== 0;
-}
+};
 
+const getCommitteeByName = async (committeeName) => {
+    const result = await db.query('SELECT * FROM committee WHERE  committee_name=$1', [committeeName]);
+
+    return result.rows[0];
+};
 
 /* Untested function - need to test! */
 const getAllCommitteeParticipantsDB = async (committeeName) => {
@@ -404,8 +409,8 @@ const getAllCommitteeParticipantsDB = async (committeeName) => {
 const insertNewCommitteeParticipant = async (participant) => {
     try {
         const result = await db.query(
-            `INSERT INTO committee_participants VALUES 
-            (${participant.ID}, ${participant.committeeName}, ${participant.role})`);
+            `INSERT INTO committee_participants VALUES ($1,$2,$3)`,
+            [participant.ID, participant.committeeName, participant.role]);
         
         return result.rowCount !== 0;
     }
@@ -683,6 +688,7 @@ module.exports = {
     insertNewCommitteeParticipant: insertNewCommitteeParticipant,
     updateCommitteeParticipantRoleDB: updateCommitteeParticipantRoleDB,
     createNewCommittee: createNewCommittee,
+    getCommitteeByName: getCommitteeByName,
     deleteCommitteeParticipantDB: deleteCommitteeParticipantDB,
     getAllCommitteeNamesAndDescFromDB: getAllCommitteeNamesAndDescFromDB,
     addRoom: addRoom,

@@ -37,7 +37,7 @@ const signJWTandSendToken = async (req, res, next) => {
     const userID = req.userData.userID;
 
     try {
-        const token = jwt.sign({ userID: userID }, process.env.ACCESS_TOKEN_SECRET);
+        const token = jwt.sign({ userID: userID, userType: req.userData.type }, process.env.ACCESS_TOKEN_SECRET);
         
         if (!token) {
             throw errorHandler('Cannot generate token', 500);
@@ -71,6 +71,7 @@ const verifyToken = async (req, res, next) => {
             }
 
             req.userID = decodedToken.userID;
+            req.userType = decodedToken.userType;
             next();
         });
     }
