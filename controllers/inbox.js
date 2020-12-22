@@ -127,7 +127,7 @@ const replyToInbox = async (req, res, next) => {
             inboxID: req.body.inbox_id,
             content: req.body.content,
             time: new Date(Date.now())
-        }
+        };
 
         const isInboxIDAlreadyExistsInReplyTable = await queries.getReplyByInboxID(reply.inboxID);
         if (isInboxIDAlreadyExistsInReplyTable) {
