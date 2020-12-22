@@ -11,8 +11,17 @@ const xpertesyController = require('../controllers/xpertesy');
 const router = express.Router();
 
 /* Creates new xpert esy room */
-router.post('/xpertesy/createroom', authorization.formatAndSetToken, authorization.verifyToken, permissions.isCommitteeOrChairpersonOrAdmin, xpertesyController.createRoom);
+router.post('/xpertesy/createroom',
+    authorization.formatAndSetToken,
+    authorization.verifyToken,
+    permissions.isCommitteeOrChairpersonOrAdmin,
+    xpertesyController.createRoom);
+
 // show xpertesy rooms 
-router.post('/xpertesy/showrooms', authorization.formatAndSetToken, authorization.verifyToken, permissions.isCommitteeOrChairpersonOrAdmin, xpertesyController.showRooms);
+router.post('/xpertesy/showrooms',
+    authorization.formatAndSetToken,
+    authorization.verifyToken,
+    permissions.isCommitteeOrChairpersonOrAdmin,
+    xpertesyController.showRooms);
 
 module.exports = router;

@@ -7,13 +7,27 @@ const permissions = require('../middleware/permission');
 const router = express.Router();
 
 /* Handles inbox applications */
-router.post('/inbox', authorization.formatAndSetToken, authorization.verifyToken, inboxController.createNewApplication);
+router.post('/inbox',
+    authorization.formatAndSetToken,
+    authorization.verifyToken,
+    inboxController.createNewApplication);
 
-router.get('/inboxesUser', authorization.formatAndSetToken, authorization.verifyToken, inboxController.getAllInboxesForUser);
+router.get('/inboxesUser',
+    authorization.formatAndSetToken,
+    authorization.verifyToken,
+    inboxController.getAllInboxesForUser);
 
-router.post('/inbox/markAsSpam/', authorization.formatAndSetToken, authorization.verifyToken, permissions.isCommitteeOrChairpersonOrAdmin, inboxController.markAsSpam);
+router.post('/inbox/markAsSpam/',
+    authorization.formatAndSetToken,
+    authorization.verifyToken,
+    permissions.isCommitteeOrChairpersonOrAdmin,
+    inboxController.markAsSpam);
 
-router.post('/inbox/response', authorization.formatAndSetToken, authorization.verifyToken, permissions.isCommitteeOrChairpersonOrAdmin, inboxController.replyToInbox);
+router.post('/inbox/response',
+    authorization.formatAndSetToken,
+    authorization.verifyToken,
+    permissions.isCommitteeOrChairpersonOrAdmin,
+    inboxController.replyToInbox);
 
 router.get('/inbox/getByCommitteeName/:committeeName',
     authorization.formatAndSetToken,
@@ -21,9 +35,15 @@ router.get('/inbox/getByCommitteeName/:committeeName',
     permissions.isCommitteeOrChairpersonOrAdmin,
     inboxController.getInboxesByCommitteeName);
 
-router.get('/inbox/getBySenderId/:senderId', authorization.formatAndSetToken, authorization.verifyToken, inboxController.getInboxesBySenderId);
+router.get('/inbox/getBySenderId/:senderId',
+    authorization.formatAndSetToken,
+    authorization.verifyToken,
+    inboxController.getInboxesBySenderId);
 
-router.get('/inbox/:id', authorization.formatAndSetToken, authorization.verifyToken, inboxController.getApplication);
+router.get('/inbox/:id',
+    authorization.formatAndSetToken,
+    authorization.verifyToken,
+    inboxController.getApplication);
 
 
 module.exports = router;
