@@ -300,7 +300,15 @@ const createNewReply = async (reply) => {
         reply.time
     ]);
 
+    await closeInboxInDB(reply.inboxID);
+
     return result.rowCount;
+};
+
+const closeInboxInDB = async (inboxID) => {
+    const result = await db.query(`UPDATE inbox SET is_open=false WHERE inbox_id=$1`, [inboxID]);
+
+    return result.rowCount !== 0;
 };
 
 const markAsSpamInDB = async (inboxID) => {
@@ -683,6 +691,7 @@ module.exports = {
     getInboxesBySenderIDFromDB: getInboxesBySenderIDFromDB,
     getReplyByInboxID: getReplyByInboxID,
     createNewReply: createNewReply,
+    closeInboxInDB: closeInboxInDB,
     markAsSpamInDB: markAsSpamInDB,
     getAllCommitteeParticipantsDB: getAllCommitteeParticipantsDB,
     insertNewCommitteeParticipant: insertNewCommitteeParticipant,
