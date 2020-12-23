@@ -30,6 +30,7 @@ const isChairpersonOrAdmin = (req, res, next) => {
 };
 
 const isCommitteeOrChairpersonOrAdmin = (req, res, next) => {
+
     try {
         if (!(req.userType === process.env.USER_TYPE_ADMIN
             || req.userType === process.env.USER_TYPE_CHAIRPERSON

@@ -4,7 +4,8 @@ let datetime = new Date();
 
 
 // use of email_validator module to check if the mails are corrects
-const validateEmail = async(emailArray, hostEmail)=> {
+const validateEmail = async (emailArray, hostEmail) => {  
+
         try{
             let emailSet = new Set(emailArray);
             if (emailSet.size !== emailArray.length){

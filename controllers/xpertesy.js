@@ -1,6 +1,7 @@
 const qr = require('../utils/queries');
 const xpertVald = require('./xpert_logic');
 const mailUtils = require('../utils/email');
+const HTMLTemplate = require("../HTML_template");
 //unique session ID module
 var uuid = require('uuid');
 const { validationResult } = require('express-validator');
@@ -97,12 +98,16 @@ const setEmails = (usersArray, meetingLink) => {
         mailUtils.sendMail(user, 'Xpertesy Meeting', html);
     });
 };
-
 const buildHTMLBodyForEmail = (user, meetingLink) => {
-    const html = `
-             <h1>Welcome</h1>
-             <p>Click the <a href=${meetingLink}${user.first_name}+${user.last_name}>link</a> to enter the xpertesy chat.</p>`;
-    
+    let html = HTMLTemplate.HTML_template;
+
+    html = html.replace("$1", `Xpertesy Invitation to: ${user.first_name} ${user.last_name}`);
+    html = html.replace("$2", (new Date()).toLocaleString('default', { month: 'long' }));
+    html = html.replace("$3", (new Date()).getDate());
+    html = html.replace("$4", "We are Waiting For You!");
+    html = html.replace("$5", "Click Here to Join Your Meeting");
+    html = html.replace("$6", meetingLink);
+
     return html;
 };
 
