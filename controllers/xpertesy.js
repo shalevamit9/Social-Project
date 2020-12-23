@@ -1,7 +1,7 @@
 const qr = require('../utils/queries');
 const xpertVald = require('./xpert_logic');
 const mailUtils = require('../utils/email');
-const HTMLTemplate = require("../HTML_template");
+const HTMLTemplate = require("../utils/HTML_template");
 //unique session ID module
 var uuid = require('uuid');
 const { validationResult } = require('express-validator');
