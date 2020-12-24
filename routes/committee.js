@@ -53,10 +53,4 @@ router.get('/committees/:id',
     permissions.isAdmin,
     committeeController.getAllCommitteeNamesAndRolls);
 
-router.get('/committees/:id',
-    authorization.formatAndSetToken,
-    authorization.verifyToken,
-    permissions.isAdmin,
-    committeeController.getAllCommitteeNamesAndRolls);
-
 module.exports = router;
