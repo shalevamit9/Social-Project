@@ -167,10 +167,10 @@ const getCommitteeNamesAndInfo = async (req, res, next) => {
 const createCommittee = async (req, res, next) => {
     try {
      
-        committeeName = req.body.name;
-        committeeDescription = req.body.description;
-        chairPersonID = req.body.chairman_id;
-        participantsIDs = req.body.participants_id;
+        const committeeName = req.body.name;
+        const committeeDescription = req.body.description;
+        const chairPersonID = req.body.chairman_id;
+        const participantsIDs = req.body.participants_id;
 
         const result = await queries.createNewCommittee(committeeName, committeeDescription, chairPersonID, participantsIDs);
 
@@ -179,8 +179,20 @@ const createCommittee = async (req, res, next) => {
     catch (error) {
         next(error);
     }
-}
+};
 
+const getAllCommitteeNamesAndRolls = async (req, res, next) => {
+    try {
+        const userID = req.params.id;
+
+        const result = await queries.getAllCommitteeNamesAndRollsFromDB(userID);       
+
+        res.status(200).json(result);
+    }
+    catch (error) {
+        next(error);
+    }
+};
 
 module.exports = {
     getAllCommitteeParticipants,
@@ -188,5 +200,6 @@ module.exports = {
     updateCommitteeParticipantRole,
     deleteCommitteeParticipant,
     getCommitteeNamesAndInfo,
-    createCommittee
+    createCommittee,
+    getAllCommitteeNamesAndRolls
 };

@@ -372,7 +372,7 @@ const insertNewApplication = async (application) => {
     catch (error) {
         throw error;
     }
-}
+};
 
 const createNewCommittee = async (committeeName, committeeDescription, chairPersonID, participantsIDs) => {
 
@@ -412,7 +412,14 @@ const getAllCommitteeParticipantsDB = async (committeeName) => {
     catch (error) {
         throw error
     }
-}
+};
+
+const getAllCommitteeNamesAndRollsFromDB = async (userID) => {
+    const result = await db.query(`
+    SELECT committee_name, committee_position FROM committee_participants WHERE user_id = ${userID}`);
+
+    return result.rows;
+};
 
 const insertNewCommitteeParticipant = async (participant) => {
     try {
@@ -439,7 +446,7 @@ const updateCommitteeParticipantRoleDB = async (participant) => {
     catch (error) {
         throw error;
     }
-}
+};
 
 const deleteCommitteeParticipantDB = async (participant) => {
     try {
@@ -455,7 +462,7 @@ const deleteCommitteeParticipantDB = async (participant) => {
     catch (error) {
         throw error;
     }
-}
+};
 
 const getAllCommitteeNamesAndDescFromDB = async () => {
     const result = await db.query('SELECT committee_name AS name, committee_information AS desc FROM committee');
@@ -472,7 +479,7 @@ const addRoom = async (link, userID, participants, time, title) => {
     catch (err) {
         throw err;
     }
-}
+};
 
 const showFutureRooms = async (userID, hostName, title, datetime) => {
     try {
@@ -700,6 +707,7 @@ module.exports = {
     getCommitteeByName: getCommitteeByName,
     deleteCommitteeParticipantDB: deleteCommitteeParticipantDB,
     getAllCommitteeNamesAndDescFromDB: getAllCommitteeNamesAndDescFromDB,
+    getAllCommitteeNamesAndRollsFromDB: getAllCommitteeNamesAndRollsFromDB,
     addRoom: addRoom,
     showFutureRooms: showFutureRooms,
     showPastRooms: showPastRooms,

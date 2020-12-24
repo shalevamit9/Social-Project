@@ -47,4 +47,10 @@ router.post('/committees/createCommitte',
     permissions.isAdmin,
     committeeController.createCommittee);
 
+router.get('/committees/:id',
+    authorization.formatAndSetToken,
+    authorization.verifyToken,
+    permissions.isAdmin,
+    committeeController.getAllCommitteeNamesAndRolls);
+
 module.exports = router;
