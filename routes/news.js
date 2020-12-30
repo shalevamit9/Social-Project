@@ -6,9 +6,9 @@ const newsConroller = require('../controllers/news');
 const router = express.Router();
 
 /* Handles inbox applications */
-router.get('/news',
-    authorization.formatAndSetToken,
-    authorization.verifyToken,
-    newsConroller.scrapeNews);
+// router.get('/news',
+//     authorization.formatAndSetToken,
+//     authorization.verifyToken,
+//     newsConroller.scrapeNews);
 
 module.exports = router;
