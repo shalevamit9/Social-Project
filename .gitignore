@@ -3,4 +3,3 @@ node_modules
 package-lock.json
 tables.sql
 images
-HTML_template.js

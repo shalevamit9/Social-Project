@@ -1,7 +1,7 @@
 const qr = require('../utils/queries');
 const xpertVald = require('./xpert_logic');
-const mailUtils = require('../utils/email');
-const HTMLTemplate = require("../utils/HTML_template");
+const mailUtils = require('../utils/mail/email');
+const HTMLTemplate = require("../utils/mail/HTML_template");
 //unique session ID module
 var uuid = require('uuid');
 const { validationResult } = require('express-validator');
@@ -100,12 +100,34 @@ const setEmails = (usersArray, meetingLink) => {
 };
 const buildHTMLBodyForEmail = (user, meetingLink) => {
     let html = HTMLTemplate.HTML_template;
+    
+    const monthDictionary = {
+        'January': 'ינואר',
+        'February': 'פברואר',
+        'March': 'מרץ',
+        'April': 'אפריל',
+        'May': 'מאי',
+        'June': 'יוני',
+        'July': 'יולי',
+        'August': 'אוגוסט',
+        'September': 'ספטמבר',
+        'October': 'אוקטובר',
+        'November': 'נובמבר',
+        'December': 'דצמבר'
+    } 
 
-    html = html.replace("$1", `Xpertesy Invitation to: ${user.first_name} ${user.last_name}`);
-    html = html.replace("$2", (new Date()).toLocaleString('default', { month: 'long' }));
+    // html = html.replace("$1", `Xpertesy Invitation to: ${user.first_name} ${user.last_name}`);
+    html = html.replace("$1", `לכבוד:
+    ${user.first_name} ${user.last_name}
+    -
+    הוזמנת לפגישת אקספרטיזי`);
+    const monthInEnglish = (new Date()).toLocaleString('en-US', { month: 'long' });
+    html = html.replace("$2", monthDictionary[monthInEnglish]);
     html = html.replace("$3", (new Date()).getDate());
-    html = html.replace("$4", "We are Waiting For You!");
-    html = html.replace("$5", "Click Here to Join Your Meeting");
+    //html = html.replace("$4", "We are Waiting For You!");
+    html = html.replace("$4", "אנו ממתינים לך!");
+    //html = html.replace("$5", "Click Here to Join Your Meeting");
+    html = html.replace("$5", "נא לחץ כאן בשביל להצטרף לפגישה");
     html = html.replace("$6", meetingLink);
 
     return html;
