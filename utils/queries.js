@@ -56,7 +56,10 @@ const getUsersByEmail = async (emails) => {
 
 const insertUserCredentialsToDB = async (user) => {
     try {
-        const result = await db.query(`INSERT INTO user_credentials VALUES($1, $2, $3)`, [user.ID, user.password, new Date(Date.now())]);
+        const result = await db.query(`INSERT INTO user_credentials 
+                                        (user_id, password, last_password_change, is_active)
+                                        VALUES
+                                        ($1, $2, $3, true)`, [user.ID, user.password, new Date(Date.now())]);
     }
     catch (error) {
         throw(error);
@@ -104,7 +107,7 @@ const getUserById = async (userID) => {
         INNER JOIN
         user_credentials
         USING(user_id)
-        WHERE user_id=$1`, [userID]);
+        WHERE user_id=$1 AND is_active = true`, [userID]);
         
         return result.rows[0];
     }
@@ -120,7 +123,7 @@ const getUserByEmail = async (email) => {
         INNER JOIN
         user_credentials
         USING(user_id)
-        WHERE email=$1`, [email]);
+        WHERE email=$1 AND is_active = true`, [email]);
 
         return result.rows[0];
     }
@@ -134,7 +137,7 @@ const getDaysSinceLastPasswordChangeInDB = async (userID) => {
         const days = await db.query(`
         SELECT DATE_PART('day', current_date - last_password_change) as "daysSinceLastPasswordChange"
         FROM user_credentials
-        WHERE user_id=$1`
+        WHERE user_id=$1 AND is_active = true`
             , [userID]
         );
 
@@ -472,9 +475,18 @@ const getAllCommitteeNamesAndDescFromDB = async () => {
 
 const addRoom = async (link, userID, participants, time, title) => {
     try {
-        let res = await db.query(`INSERT INTO "xpertesy" (link, host_id, participants, value_date, title)
-        VALUES ($1,$2,$3::text[],$4,$5)`, [link, userID, participants, time, title]);
-        return res;
+        await db.query(`INSERT INTO xpertesy (link, host_id, value_date, title)
+        VALUES ($1, $2, $3, $4)`, [link, userID, time, title]);
+
+        let query = `INSERT INTO xpertesy_to_user_details (link, email) VALUES `;
+        participants.forEach(email => {
+            query += `('${link}', '${email}'), `;
+        });
+
+        // Remove the last ', ' from the query string
+        query = query.slice(0, -2);
+
+        await db.query(query);
     }
     catch (err) {
         throw err;
@@ -677,6 +689,28 @@ const updateImageStatusInDB = async (imagesInfo) => {
     return result.rowCount !== 0;
 };
 
+const getAmountOfPasswordsEqualToNewPassword = async (userId, newPassword) => {
+    const result = await db.query('SELECT * FROM user_credentials WHERE user_id = $1 AND password = $2', [userId, newPassword]);
+
+    return result.rows;
+};
+
+const invalidateOldPassword = async (serialId) => {
+    const result = await db.query('UPDATE user_credentials SET is_active = false WHERE serial_id = $1', [serialId]);
+};
+
+const getAmountOfPasswordsForUser = async (userId) => {
+    const result = await db.query('SELECT * FROM user_credentials WHERE user_id = $1', [userId]);
+
+    return result.rows.length;
+};
+
+const deleteOldestPassword = async (userId) => {
+    const result = await db.query(`DELETE FROM user_credentials 
+                                          WHERE serial_id = (SELECT serial_id FROM user_credentials WHERE user_id = $1
+				                            AND last_password_change = (SELECT MIN(last_password_change) FROM user_credentials WHERE user_id = $1))`, [userId]);
+};
+
 module.exports = {
     getAllUsersFromDB: getAllUsersFromDB,
     insertUserCredentialsToDB: insertUserCredentialsToDB,
@@ -720,5 +754,9 @@ module.exports = {
     getAllImagesByStatusFromDB,
     insertImagesToDB,
     deleteImageFromDB,
-    updateImageStatusInDB
+    updateImageStatusInDB,
+    getAmountOfPasswordsEqualToNewPassword: getAmountOfPasswordsEqualToNewPassword,
+    invalidateOldPassword: invalidateOldPassword,
+    getAmountOfPasswordsForUser: getAmountOfPasswordsForUser,
+    deleteOldestPassword: deleteOldestPassword
 };

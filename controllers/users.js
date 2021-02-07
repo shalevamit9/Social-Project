@@ -201,13 +201,29 @@ const matchBirthday = async (req, res, next) => {
 const changePassword = async (req, res, next) => {
     try {
         const user = await queries.getUserById(req.params.id);
-        const oldPassword = user.password;
         const newPassword = req.body.password;
-        const isNewPassEqualsOldPass = oldPassword === newPassword;
+        
+        // Check new password is different than last 3 passwords
+        const comparisonRows = await queries.getAmountOfPasswordsEqualToNewPassword(user.user_id, newPassword);
+        const isPasswordDifferentThanLastThreePasswords = comparisonRows.length === 0;
+        
+        if (isPasswordDifferentThanLastThreePasswords) {
+            // Set is_active of old password to false
+            await queries.invalidateOldPassword(user.serial_id);
+            
+            // Insert new row to user_credentials with is_active = true
+            user.ID = user.user_id;
+            user.password = newPassword;
+            await queries.insertUserCredentialsToDB(user);
 
-        if (!isNewPassEqualsOldPass) {
-            // Execute if the passwords don't match
-            await queries.updateColumn('user_credentials', 'password', newPassword, user.user_id);
+            // Check if there are more than 3 last passwords
+            const AmountOfPasswordsForUser = await queries.getAmountOfPasswordsForUser(user.user_id);
+            
+            // If true, delete the row of the oldest one
+            if (AmountOfPasswordsForUser > 3) {
+                await queries.deleteOldestPassword(user.user_id);
+            }
+
             res.status(201).json(true);
         }
         else {
