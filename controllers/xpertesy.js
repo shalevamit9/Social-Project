@@ -116,7 +116,6 @@ const buildHTMLBodyForEmail = (user, meetingLink) => {
         'December': 'דצמבר'
     } 
 
-    // html = html.replace("$1", `Xpertesy Invitation to: ${user.first_name} ${user.last_name}`);
     html = html.replace("$1", `לכבוד:
     ${user.first_name} ${user.last_name}
     -
@@ -124,9 +123,7 @@ const buildHTMLBodyForEmail = (user, meetingLink) => {
     const monthInEnglish = (new Date()).toLocaleString('en-US', { month: 'long' });
     html = html.replace("$2", monthDictionary[monthInEnglish]);
     html = html.replace("$3", (new Date()).getDate());
-    //html = html.replace("$4", "We are Waiting For You!");
-    html = html.replace("$4", "אנו ממתינים לך!");
-    //html = html.replace("$5", "Click Here to Join Your Meeting");
+    html = html.replace("$4", "אנו ממתינים לך");
     html = html.replace("$5", "נא לחץ כאן בשביל להצטרף לפגישה");
     html = html.replace("$6", meetingLink);
 
